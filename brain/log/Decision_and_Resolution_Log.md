@@ -3516,16 +3516,16 @@ them into the append-only log so it is the continuous WP1-to-present record.
        arm D relative to arm B. Adaptation pays for the cell out of the group.
      - **P3.** At the Beer Hall, arm D does not overtake arm A. C7 found the unpartitioned band
        beats both Mondrian arms there at 0.880.
-     - **P4.** At Ellel, arm D's adaptation is dominated by the group whose mass is zeros — read
+     - **P4.** At Ellel, arm D's adaptation is dominated by the group whose mass is zeros - read
        here, and the reading is stated because the phrase is ambiguous, as **the calendar-OPEN
-       group, 1,037 of whose 1,300 observations took nothing** — and the calendar-open group's bands
+       group, 1,037 of whose 1,300 observations took nothing** - and the calendar-open group's bands
        widen without conditional coverage improving proportionally.
      - **P5.** The misgrouping counts are unchanged across all arms: **94, 21, 65**. Adaptation
        changes level, not membership.
      **(k) THE FIVE REFUTATION CRITERIA, pre-committed. A refuted prediction is a result and is
      reported FIRST, at full prominence, and is never softened into a partial confirmation.**
-     - **R1.** If P1 holds and P2 does not — the cell reaches nominal without a material width
-       increase — then adaptation repaired misspecification and **the C7 framing is wrong. Say so
+     - **R1.** If P1 holds and P2 does not - the cell reaches nominal without a material width
+       increase - then adaptation repaired misspecification and **the C7 framing is wrong. Say so
        plainly.**
      - **R2.** If arm D beats arm A at the Beer Hall on **both** coverage and width, **C7's
        conclusion that the partition does not pay there reverses.**
@@ -3587,19 +3587,19 @@ them into the append-only log so it is the continuous WP1-to-present record.
      to WIDEN under arm D. It **narrowed**, by 9.55 (−1.34 per cent), and coverage fell 0.9257
      [0.909, 0.940] to 0.8852 [0.866, 0.903] on n = 1,185, the two intervals disjoint.
      **(c) P1 REFUTED in substance; only its sign held.** The Beer Hall's
-     scheduled-closed-but-traded cell moved 0.4894 to 0.5213 on n = 94 — **7.8 per cent of the
-     0.4106 gap to nominal** — and arm D's interval [0.416, 0.625] still excludes nominal by
+     scheduled-closed-but-traded cell moved 0.4894 to 0.5213 on n = 94 - **7.8 per cent of the
+     0.4106 gap to nominal** - and arm D's interval [0.416, 0.625] still excludes nominal by
      0.275, overlapping arm B's across roughly 85 per cent of its length. No between-arm
      significance test was pre-registered and none was run, because choosing an adjudicating test
      after seeing the result is the move the package exists to prevent.
      **(d) P2, P3 and P5 HELD.** P2: the Beer Hall's calendar-closed group widened 164.16 to
-     195.52, **+19.10 per cent**, n = 500 — so the group paid and the cell did not collect. P3: arm
+     195.52, **+19.10 per cent**, n = 500 - so the group paid and the cell did not collect. P3: arm
      D does not overtake arm A there, being both further from nominal (0.8726 against 0.8800) and
      wider (997.85 against 947.84). P5: 94 / 21 / 65 on the record frame, identical across arms.
      **(e) The mechanism's hard limit, which is the finding.** At Ellel the misgrouped cell is
      0.0000 coverage under BOTH arm B and arm D on n = 21; adaptation moved its mean width from
      0.00 to 12.49 and **covered none of the twenty-one**. ACI adapts the LEVEL, and the quantile
-     that level is taken of is drawn from the group's own residuals — when those are all near
+     that level is taken of is drawn from the group's own residuals - when those are all near
      zero, every quantile of them is near zero. **Adaptation cannot manufacture a residual the
      group has never seen**, so it is powerless exactly where misgrouping is worst.
      **(f) Unsolicited: the unpartitioned band already matches the ORACLE on the broken cell.** At
@@ -3617,7 +3617,7 @@ them into the append-only log so it is the continuous WP1-to-present record.
      partition inherits it.
      **(h) Unsolicited: the package brief names the wrong module and following it would have
      refuted R5.** Build constraint 10 says `signals/residual.py` supplies the residual stream and
-     group assignment. Report 86 section 8 already recorded in S12 that it does not — it *"supplies
+     group assignment. Report 86 section 8 already recorded in S12 that it does not - it *"supplies
      the deviation detector's stream, a different object from the conformal calibration pass, and
      importing it would have measured the wrong band"*. Constraint 10 and the brief's own
      requirement that arm B reuse C7's path are in direct conflict; the reuse requirement won, and
@@ -3627,7 +3627,7 @@ them into the append-only log so it is the continuous WP1-to-present record.
      consumed the difference. Both frames are reported for every venue.
      **(j) Unsolicited: two defects in this session's own work, found and repaired.** The first
      reporting pass attributed zero-width intervals by each arm's own `state` column, which for arm
-     E is the OCCURRENCE label — a different variable from the other four arms', making the row
+     E is the OCCURRENCE label - a different variable from the other four arms', making the row
      incomparable. The second differenced the per-group widths by hand from rounded display values
      and got Ellel's delta as −9.54 against the instrumented −9.55; the delta is now a field
      (`b_to_d_group_deltas`) for the same reason C7 added `cell_deltas` to its own instrument.

@@ -5392,17 +5392,17 @@ half minutes, and the gap is checkable from `git log` rather than asserted.
 
 **Artefacts written.**
 
-- `brain/eval/mondrian_aci.py` — the instrument. Only arm D (Mondrian × AgACI, one AgACI **per
+- `brain/eval/mondrian_aci.py` - the instrument. Only arm D (Mondrian × AgACI, one AgACI **per
   group**) is new code; arms A, B, C and E are `interval_calibration.run_online` and
   `partition_contrast` reused unmodified.
-- `brain/eval/mondrian_aci.json` — 101,870 bytes, schema documented at `log/95` §8.
-- `brain/tests/test_mondrian_aci.py` — 26 tests, synthetic, no store and no network.
-- `brain/log/95_mondrian_aci.md` — the report.
+- `brain/eval/mondrian_aci.json` - 101,870 bytes, schema documented at `log/95` §8.
+- `brain/tests/test_mondrian_aci.py` - 26 tests, synthetic, no store and no network.
+- `brain/log/95_mondrian_aci.md` - the report.
 
 **Verified end state.**
 
 - Store ceiling **2026-07-07** asserted before and after every pass.
-- **R5 and R4 both PASS at absolute difference 0.0** against `eval/partition_contrast.json` —
+- **R5 and R4 both PASS at absolute difference 0.0** against `eval/partition_contrast.json` -
   exact at full precision, not merely at report 86's four published decimals. **P5 exact as
   integers** across all ten banded arms.
 - **P4 and P1 REFUTED**, P2, P3 and P5 held, **no refutation criterion fired**. Two of five
@@ -5411,7 +5411,7 @@ half minutes, and the gap is checkable from `git log` rather than asserted.
 - The arm is a leaf: `rg` finds `mondrian_aci` in exactly two files, its own module and its own
   test. Nothing served or evaluated was modified.
 - `graphify update .` run at close: 14,837 → **14,915 nodes**, 26,620 edges, 991 communities.
-  `graphify label` deliberately NOT run — it reports a skip and removes `graph.html`.
+  `graphify label` deliberately NOT run - it reports a skip and removes `graph.html`.
 
 **Unstarted, and deliberately so.** The **placement question is OPEN**: whether any of this
 enters the dissertation was forbidden to this package and was not decided. Row **113(k)** carries

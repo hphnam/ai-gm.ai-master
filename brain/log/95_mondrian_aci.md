@@ -65,8 +65,8 @@ Width **−9.55** (−1.34 %), coverage **−0.0405**, both read from the artefa
 `b_to_d_group_deltas` at full precision rather than differenced from the rounded display
 values above. The prediction was that adaptation would buy
 width in this group and fail to convert it into conditional coverage. What happened is
-that adaptation **sold** width and lost coverage as well. The prediction's mechanism —
-that the zero-dominated group drags the adaptation — is not what the numbers show;
+that adaptation **sold** width and lost coverage as well. The prediction's mechanism -
+that the zero-dominated group drags the adaptation - is not what the numbers show;
 the group simply got tighter and worse on both counts.
 
 **Stated without softening: the width limb of P4 is wrong in sign, and the coverage
@@ -80,7 +80,7 @@ not a reading artefact.
 | B, Mondrian fixed | **94** | 0.4894 | [0.385, 0.595] |
 | D, Mondrian × AgACI | **94** | 0.5213 | [0.416, 0.625] |
 
-The cell rose by **+0.0319** against a gap to nominal of **0.4106** — it travelled
+The cell rose by **+0.0319** against a gap to nominal of **0.4106** - it travelled
 **7.8 per cent** of the distance P1 said it would travel. Arm D's interval
 [0.416, 0.625] **excludes nominal 0.900 by 0.275**, and the two arms' intervals overlap
 across almost their entire length.
@@ -97,9 +97,9 @@ degree this instrument can separate from zero. The sign was right and that is al
 
 ## 2 · The reproduction checks
 
-### 2.1 · R5 — arm B against C7's published Mondrian coverage. **PASS.**
+### 2.1 · R5 - arm B against C7's published Mondrian coverage. **PASS.**
 
-Compared at **four decimal places**, the precision report 86 published in §§3.1–3.3.
+Compared at **four decimal places**, the precision report 86 published in §§3.1-3.3.
 The persisted full-precision floats are read from `eval/partition_contrast.json`, not
 transcribed; the published literals are carried separately so a drift between the
 artefact and the *report* would also fail.
@@ -114,7 +114,7 @@ Agreement is **exact at full precision**, not merely at four places. Arm B is th
 baseline every comparison runs through, so this is the check that most matters, and it
 holds.
 
-### 2.2 · R4 — arm E against C7's published ORACLE coverage. **PASS.**
+### 2.2 · R4 - arm E against C7's published ORACLE coverage. **PASS.**
 
 | Venue | cell n | arm E measured | persisted (C7) | abs diff | published | verdict |
 |---|---|---|---|---|---|---|
@@ -124,7 +124,7 @@ holds.
 
 **Arm E is an ORACLE and is not deployable.** Occurrence is unknown at forecast time.
 
-### 2.3 · P5 — membership invariance. **PASS**, exact, integer, no tolerance.
+### 2.3 · P5 - membership invariance. **PASS**, exact, integer, no tolerance.
 
 | Venue | persisted `n_calendar_closed_but_traded` | records frame | banded frame, every arm | identical across arms |
 |---|---|---|---|---|
@@ -138,7 +138,7 @@ failing direction.
 
 **Frame note, because the package brief conflates two populations.** 94 / 21 / 65 are
 **record-frame** counts. On the **banded** frame, smaller because the first 140 pool
-residuals are consumed by the warmup, Two River Taps' cell is **38, not 65** — and R5's
+residuals are consumed by the warmup, Two River Taps' cell is **38, not 65** - and R5's
 0.737 is a coverage over those 38. Both frames are given above; no coverage is quoted
 against a frame it was not computed on.
 
@@ -211,7 +211,7 @@ B [0.385, 0.595], C [0.853, 0.970], D [0.416, 0.625], E [0.853, 0.970].
 Group 0 = calendar-open, group 1 = calendar-closed.
 
 Δ columns are the artefact's `b_to_d_group_deltas` fields, computed in the instrument at
-full precision — **not** differenced from the rounded widths in the same row. The two
+full precision - **not** differenced from the rounded widths in the same row. The two
 disagree at Ellel (−9.55 instrumented against −9.54 by hand), which is why the field
 exists.
 
@@ -256,7 +256,7 @@ Adaptive arms only; fixed arms cannot excurse.
 | ellel | 127 | **50** | **10** |
 | two_river_taps | 124 | **29** | **0** |
 
-### 4.3 · Attainability clamps — the group's calibration slice too small for the level
+### 4.3 · Attainability clamps - the group's calibration slice too small for the level
 
 **Fixed Mondrian arms, counted in rows, with the scope of the scan stated** (a zero over
 an unexamined loop would be UNKNOWN, not clean):
@@ -276,7 +276,7 @@ an unexamined loop would be UNKNOWN, not clean):
 Arm E's groups are **occurrence** groups, which is what it bands on. Arm A is ungrouped
 and its pool is never below the 140 warmup, so the level is always attainable.
 
-**Arm D, counted in `safe_conformal_quantile` CALLS** (not rows — arm D's quantile is
+**Arm D, counted in `safe_conformal_quantile` CALLS** (not rows - arm D's quantile is
 drawn per expert per step per group, so calls and rows are not commensurable):
 
 | Venue | total calls | group 0 attainability | group 0 max-residual | group 1 attainability | group 1 max-residual | degenerate share |
@@ -291,7 +291,7 @@ pool at a banding origin, so the documented fallback to the whole pool was never
 **Scope limit, stated rather than left as a gap.** Arm C's attainability clamps are not
 separately attributable. Its bands are produced inside `run_online`, which computes
 every arm in one pass, so a tap installed there would count calls belonging to arms P,
-D, S and the five fixed-γ arms as well — and `run_online` is reused unmodified per the
+D, S and the five fixed-γ arms as well - and `run_online` is reused unmodified per the
 build constraint. Arm C's level-excursion count (§4.2) is reported in its place.
 
 ---
@@ -328,11 +328,11 @@ engaged**, which is worth stating precisely rather than resolving one way.
 
 | Venue | B marginal | C marginal | D marginal | which pairs have disjoint intervals |
 |---|---|---|---|---|
-| beer_hall | 0.8714 [0.855, 0.887] | 0.8914 [0.876, 0.906] | 0.8726 [0.856, 0.888] | **none — all three overlap pairwise** |
+| beer_hall | 0.8714 [0.855, 0.887] | 0.8914 [0.876, 0.906] | 0.8726 [0.856, 0.888] | **none - all three overlap pairwise** |
 | ellel | 0.9138 [0.899, 0.927] | 0.8813 [0.865, 0.896] | 0.8885 [0.872, 0.903] | B/C only |
 | two_river_taps | 0.9631 [0.951, 0.973] | 0.9176 [0.901, 0.932] | 0.9270 [0.911, 0.941] | B/C and B/D |
 
-**At the Beer Hall — the venue this package is centred on — arms B, C and D are
+**At the Beer Hall - the venue this package is centred on - arms B, C and D are
 marginally indistinguishable**, and row 112(l)'s null verdict applies there: on marginal
 coverage, this venue's data cannot separate the three calibration strategies. That sits
 **alongside** the existing Model Confidence Set result rather than against it. It does
@@ -382,7 +382,7 @@ Constraint 10 and Part 3.1's requirement that arm B reuse C7's path are in direc
 conflict. The reuse requirement won, and R5 then reproduced exactly. This is recorded in
 row 112(d) as a design decision taken **before** the run, not as a discovery after it.
 
-### 7.2 · Adaptation cannot manufacture a residual the group has never seen — Ellel is the limit case
+### 7.2 · Adaptation cannot manufacture a residual the group has never seen - Ellel is the limit case
 
 | Ellel `closed_traded`, n = 21 | coverage | CI | mean width | median width |
 |---|---|---|---|---|
@@ -391,7 +391,7 @@ row 112(d) as a design decision taken **before** the run, not as a discovery aft
 
 Twenty-one days on which the venue traded, banded against a calendar-closed group whose
 residual pool is essentially all zeros. Arm D drove the group's effective level up and
-the mean width moved from a literal point interval to **12.49** — and **covered not one
+the mean width moved from a literal point interval to **12.49** - and **covered not one
 of the twenty-one**. 294 of arm D's 1,659 rows at Ellel are exactly zero-width.
 
 **This is the mechanism's hard limit and it is the finding the package was built to
@@ -416,7 +416,7 @@ good as knowing the answer** on the cell the partition breaks. This sharpens C7 
 which observed only that the ungrouped band beats both Mondrian arms marginally: the
 agreement here is on the specific cell, at the same coverage as an oracle that cannot be
 built. The partition is what breaks the cell, and both ways of not having that partition
-— dropping it, or replacing it with the truth — arrive at the same place.
+- dropping it, or replacing it with the truth - arrive at the same place.
 
 ### 7.4 · Composing AgACI with Mondrian divides the calibration pool twice, and manufactures a degeneracy the partition alone does not have
 
@@ -426,7 +426,7 @@ slices the pool on both axes at once, so arm D's quantiles are drawn from
 
 The consequence is measured. Arm B recorded **zero** attainability clamps at all three
 venues over 500 / 474 / 364 examined (origin, group) events, and the smallest group slice
-it ever saw at any venue was **37** (Two River Taps; 39 at the Beer Hall, 40 at Ellel) —
+it ever saw at any venue was **37** (Two River Taps; 39 at the Beer Hall, 40 at Ellel) -
 comfortably above the attainable minimum of 9. Arm D recorded
 **324 attainability clamps at the Beer Hall alone** (7.3 per cent of its 8,750 quantile
 calls degenerate, counting both kinds).
@@ -435,7 +435,7 @@ calls degenerate, counting both kinds).
 per-step adaptive method with a group partition inherits it, and the cost scales with the
 product of the two granularities.
 
-### 7.5 · At Ellel arm D crosses from over-coverage to under-coverage, which is the unsafe direction — and at Two River Taps it does the opposite
+### 7.5 · At Ellel arm D crosses from over-coverage to under-coverage, which is the unsafe direction - and at Two River Taps it does the opposite
 
 `CONTRACT.md` (Bundle out) records over-coverage as split conformal's **safe** failure
 mode and under-coverage as the one that is not. Marginal coverage against nominal 0.900:
@@ -465,7 +465,7 @@ the larger cell (§7.6).
 ### 7.6 · Arm E over-covers at Two River Taps rather than being right, and arm D makes its safest cell worse
 
 Arm E's `closed_traded` at Two River Taps is 1.0000 [0.907, 1.000], which excludes
-nominal **above** — the oracle over-covers there rather than being correct, as report 86
+nominal **above** - the oracle over-covers there rather than being correct, as report 86
 §6.1 already noted. Separately, arm D degrades Two River Taps' `closed_took_nothing` cell
 from 0.9939 [0.978, 0.999] (arm B) to 0.9448 [0.914, 0.967] on n = 326, and narrows the
 calendar-closed group from 228.83 to 201.71. Adaptation there tightened a group that was
@@ -506,8 +506,8 @@ Per venue:
 |---|---|
 | `point_model` / `n_origins` | forecaster behind the residuals; rolling origins in the calibration pass |
 | `contingency_records` / `contingency_banded` | C7's four-cell counts and shares over the FULL record frame and the BANDED frame |
-| `arms.<arm>` | `overall`, `cells.<cell>`, `by_availability_group.<0\|1>` — **ten arms**: the five factorial arms plus `ACI_fixed_gamma_<γ>` for each pre-registered γ |
-| `b_to_d_group_deltas.<group>` | `b_coverage`, `d_coverage`, `delta_coverage`, `b_mean_width`, `d_mean_width`, `delta_mean_width`, `relative_width_change` — the fields P2 and P4 are verdicts about |
+| `arms.<arm>` | `overall`, `cells.<cell>`, `by_availability_group.<0\|1>` - **ten arms**: the five factorial arms plus `ACI_fixed_gamma_<γ>` for each pre-registered γ |
+| `b_to_d_group_deltas.<group>` | `b_coverage`, `d_coverage`, `delta_coverage`, `b_mean_width`, `d_mean_width`, `delta_mean_width`, `relative_width_change` - the fields P2 and P4 are verdicts about |
 | `degeneracy` | `attainable_min_n`, `zero_width_group_variable`, `scope_note`, and `arms.<arm>` |
 | `wall_seconds` | `generate_records`, `run_online_availability_ABC`, `run_online_occurrence_E`, `arm_D_grouped_agaci` |
 | `adaptive_clamps` | arm C's level-excursion total; arm D's per group |
@@ -559,7 +559,7 @@ including the new one, is under a second per venue.
   function. It is installed only around arm D's banding, after arms A/B/C/E have already
   been computed, and its restore is tested.
 
-**Suite scope.** See §10 — the suite is reported in its correctly scoped form and no bare
+**Suite scope.** See §10 - the suite is reported in its correctly scoped form and no bare
 green is claimed.
 
 ---
@@ -569,9 +569,9 @@ green is claimed.
 `tests/test_mondrian_aci.py` alone: **26 passed**, in `.venv-forecast`.
 
 The full `brain/tests/` suite carries one unmarked network-dependent test excludable
-only by node id —
+only by node id -
 `tests/test_a4_ladder.py::test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted`,
-which falls back to downloading Chronos weights from Hugging Face unauthenticated — and
+which falls back to downloading Chronos weights from Hugging Face unauthenticated - and
 one venv-boundary skip. The scoped run is:
 
 ```
@@ -580,7 +580,7 @@ one venv-boundary skip. The scoped run is:
 ```
 
 **Result: 667 passed, 1 skipped, 0 failed, 0 errors, 1 deselected.** Exit code 0, but the
-count is not read off the exit code — see below.
+count is not read off the exit code - see below.
 
 The skip is the venv boundary and it names itself:
 `tests/test_intermittent.py:37: statsforecast absent: it is an eval-only dependency
@@ -588,8 +588,8 @@ The skip is the venv boundary and it names itself:
 (scipy/numba); cross-check skipped per spec G2.2`.
 
 **The counts had to be derived, and how is worth recording.** This project's pytest
-configuration **prints no final `N passed` line at all** — the output ends at the warnings
-summary — so a run piped through `tail` yields an exit code and no count, which is exactly
+configuration **prints no final `N passed` line at all** - the output ends at the warnings
+summary - so a run piped through `tail` yields an exit code and no count, which is exactly
 the shape this project's rules forbid reading a verdict off. `--collect-only -q` likewise
 prints one line per **file** (`tests/test_a0_ingest.py: 5`) rather than node ids, so
 `grep -c '::'` over it returns **0**: an empty scan wearing a real zero's clothes.
@@ -617,20 +617,20 @@ Seven commits, all authored `hapuna-namhoang`, no trailer, in this order:
 
 | SHA | Time (+01:00) | What |
 |---|---|---|
-| `6348a082` | 17:33:52 | **pre-registration, row 112** — before the instrument existed |
+| `6348a082` | 17:33:52 | **pre-registration, row 112** - before the instrument existed |
 | `d76abf7c` | 17:40:22 | the five-arm instrument and its tests |
 | `2d0cc50a` | 17:47:00 | per-group stats, auditable degeneracy scope, first artefact |
 | `f0c3d5bc` | 18:05:42 | the B-to-D group delta P2 and P4 rest on; report 95 |
-| `dbb4f1d7` | — | two claims in report 95 the artefact does not support, corrected |
-| `29b24b2c` | — | the artefact schema report 95 was missing |
-| `114f5b12` | — | ledger row 113, `phase_state.md`, the open-question pointer |
-| `c15ab728` | — | the scoped suite result, in report 95 and ledger row 113(l) |
+| `dbb4f1d7` | - | two claims in report 95 the artefact does not support, corrected |
+| `29b24b2c` | - | the artefact schema report 95 was missing |
+| `114f5b12` | - | ledger row 113, `phase_state.md`, the open-question pointer |
+| `c15ab728` | - | the scoped suite result, in report 95 and ledger row 113(l) |
 
 **Store ceiling 2026-07-07**, asserted before and after every pass.
 **Nothing was pushed**, per the package. The Overleaf remote is unchanged and still holds
 S19's two unpushed commits; the push is a human gate and Nam takes it by hand.
 `graphify update .` run at close: 14,837 → **14,915 nodes**, 26,620 edges, 991 communities.
-`graphify label` deliberately **not** run — it reports a skip and removes `graph.html`.
+`graphify label` deliberately **not** run - it reports a skip and removes `graph.html`.
 
 ---
 
@@ -643,11 +643,11 @@ words, and does not consult `reduction_cost_register.md`.
 
 It claims what was measured: **adapting the level, per group, on a partition that is
 wrong about membership, bought a 19 per cent wider calendar-closed group at the Beer Hall
-and moved the misgrouped cell 3 points of the 41 it needed — and at Ellel, where the
+and moved the misgrouped cell 3 points of the 41 it needed - and at Ellel, where the
 misgrouped group's residuals are all zeros, it moved the cell not at all.**
 
 **FORWARD POINTER, placed here because this is where a reader arriving by grep stops.**
-The placement question — whether any of this enters the dissertation — **is OPEN and has
+The placement question - whether any of this enters the dissertation - **is OPEN and has
 not been decided by anyone.** The S20 package forbade taking it here and it was not taken.
 The decision, when it is taken, belongs in a ledger row above **113**; row **113(k)**
 records the question as live and notes the constraint it meets first, which is that row
