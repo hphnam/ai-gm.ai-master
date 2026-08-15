@@ -3639,6 +3639,15 @@ them into the append-only log so it is the continuous WP1-to-present record.
      session reading report 95 or this row should treat that question as live and should note that
      row 111(h) records the document at **+7 words against a stated reserve floor of 250**, which
      is the constraint any such decision runs into first.
-     **(l) Nothing was pushed.** No `.tex`, `.bib` or figure was touched; the Overleaf remote is
+     **(l) Suite, in its correctly scoped form; no bare green is claimed.** **667 passed, 1
+     skipped, 0 failed, 0 errors, 1 deselected.** The deselected node is the one unmarked
+     network-dependent test, `tests/test_a4_ladder.py::test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted`;
+     the skip is the venv boundary, `tests/test_intermittent.py:37`, statsforecast absent per spec
+     G2.2. **The count had to be derived because this project's pytest prints no final `N passed`
+     line**, so a piped run gives an exit code and nothing else, and `--collect-only -q` prints one
+     line per FILE rather than node ids, making `grep -c '::'` return a fake zero. Reconciled two
+     ways that agree: 667+1 progress characters = 668 executed, and 669 collected minus 1
+     deselected = 668.
+     **(m) Nothing was pushed.** No `.tex`, `.bib` or figure was touched; the Overleaf remote is
      unchanged. Nothing served or evaluated was modified and the arm is a leaf: `rg` finds
      `mondrian_aci` referenced in exactly two files, its own module and its own test.

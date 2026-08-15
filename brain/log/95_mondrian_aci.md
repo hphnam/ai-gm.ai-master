@@ -579,14 +579,56 @@ one venv-boundary skip. The scoped run is:
     --deselect "tests/test_a4_ladder.py::test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted"
 ```
 
-**Result: recorded below with its counts.** Nothing in this session imports or is
-imported by the ladder.
+**Result: 667 passed, 1 skipped, 0 failed, 0 errors, 1 deselected.** Exit code 0, but the
+count is not read off the exit code — see below.
+
+The skip is the venv boundary and it names itself:
+`tests/test_intermittent.py:37: statsforecast absent: it is an eval-only dependency
+(requirements-eval.txt, .venv-eval) and does not build on the 3.14 runtime venv
+(scipy/numba); cross-check skipped per spec G2.2`.
+
+**The counts had to be derived, and how is worth recording.** This project's pytest
+configuration **prints no final `N passed` line at all** — the output ends at the warnings
+summary — so a run piped through `tail` yields an exit code and no count, which is exactly
+the shape this project's rules forbid reading a verdict off. `--collect-only -q` likewise
+prints one line per **file** (`tests/test_a0_ingest.py: 5`) rather than node ids, so
+`grep -c '::'` over it returns **0**: an empty scan wearing a real zero's clothes.
+
+The count above is therefore reconciled two ways and they agree:
+
+| Source | Figure |
+|---|---|
+| progress characters in the captured run (`.` / `s` / `F` / `E`) | 667 + 1 + 0 + 0 = **668 executed** |
+| sum of `--collect-only` per-file counts, minus the deselected node | 669 − 1 = **668** |
+
+**Nothing in this session imports or is imported by the ladder**, whose one
+network-dependent test is the deselected node.
 
 ---
 
 ## 11 · End state
 
-Recorded at close of session; see the closing entry appended below.
+**HEAD SHA at start: `8f1d86c60279f5471d32cd03ec4521d803ab8294`.**
+**HEAD SHA at end: `c1e0b16f` (this commit).**
+
+Seven commits, all authored `hapuna-namhoang`, no trailer, in this order:
+
+| SHA | Time (+01:00) | What |
+|---|---|---|
+| `6348a082` | 17:33:52 | **pre-registration, row 112** — before the instrument existed |
+| `d76abf7c` | 17:40:22 | the five-arm instrument and its tests |
+| `2d0cc50a` | 17:47:00 | per-group stats, auditable degeneracy scope, first artefact |
+| `f0c3d5bc` | 18:05:42 | the B-to-D group delta P2 and P4 rest on; report 95 |
+| `dbb4f1d7` | — | two claims in report 95 the artefact does not support, corrected |
+| `29b24b2c` | — | the artefact schema report 95 was missing |
+| `114f5b12` | — | ledger row 113, `phase_state.md`, the open-question pointer |
+| `c1e0b16f` | — | the suite result and this table |
+
+**Store ceiling 2026-07-07**, asserted before and after every pass.
+**Nothing was pushed**, per the package. The Overleaf remote is unchanged and still holds
+S19's two unpushed commits; the push is a human gate and Nam takes it by hand.
+`graphify update .` run at close: 14,837 → **14,915 nodes**, 26,620 edges, 991 communities.
+`graphify label` deliberately **not** run — it reports a skip and removes `graph.html`.
 
 ---
 
