@@ -772,6 +772,70 @@ does.
   Winkler win, so widening the served band is a decision with its own review, not an integration-phase
   change. Owner: a served-band review. Evidence: report 49 Part 2, `interval_calibration_L1.json`.
 
+  **UPDATE 2026-08-15 (S21 report 96, S22 report 97; decision row 115). Still OPEN. The shortfall
+  now has a located cause and a second candidate repair, and both halves of the evidence are
+  recorded here because a flag carrying only the supporting half would be worse than no update.**
+  *Where it lives.* The Mondrian partition is served at all three venues, established from the
+  store and not from the code that could have written it: `config.py:240`
+  (`STRUCTURAL_ZERO_DOW = frozenset({0, 1})`) reaches the band through
+  `org_profile.structural_zero_dow` and `conformal.wrap._mondrian_quantiles`, and the two calendar
+  groups carry half-widths of 158 against 728 at the Beer Hall, 0 against 545 at Ellel, 197 against
+  321 at Two River Taps. The Beer Hall's marginal shortfall localises to the **94 calendar-closed
+  days on which the venue traded**: the served band covers **46 of 94** there (0.4894, CP
+  [0.385, 0.595]) and site 8's applied text at `results.tex:607-610` already states those days
+  carry **77 per cent of the venue's coverage shortfall**.
+  *The candidate.* Dropping the partition covers **87 of 94** on that same cell (0.9255, CP
+  [0.853, 0.970]), which is **exactly** what an occurrence ORACLE covers, arm for arm, and 0.8800
+  marginally against the served 0.8714. It needs no covariate this project lacks and no method not
+  already implemented and tested here; the pooled quantile is `conformal.wrap.conformal_quantile`
+  on the ungrouped pool. Evidence: `log/95_mondrian_aci.md` section 7.3, `eval/mondrian_aci.json`.
+  *The counter evidence, which is not weaker.* `chapters/results.tex` Table `tab:winkler` has the
+  partitioned arm beating the unpartitioned arm at **all three** venues (1807 against 1940 at the
+  Beer Hall, 1263 against 1435 at Ellel, 646 against 654 at Two River Taps), and the confidence set
+  retains all five methods at the Beer Hall. **The Winkler score is the criterion this project's
+  pre-registered adoption rule reads**, and under it no alternative was adopted. Winkler penalises
+  width; conditional coverage on a cell does not. The two are answers to different questions.
+  *Status.* **The arbitration is unresolved and is NOT taken by S21 or S22.** It belongs to the
+  served-band review that already owns this flag. Nothing was changed in the served path.
+
+- **FLAG-BAND-DEGENERATE-ELLEL (OPEN, recorded not repaired; S22, report 97).** The served store
+  holds **12 band rows at Ellel, level 0.90, model `conformal_rung2_ets`, with half-width exactly
+  0.00**, every one a Monday or Tuesday, 2026-03-30 to 2026-05-05. A zero-width band admits only an
+  actual equal to the forecast to the penny.
+  *The mechanism.* The Mondrian calendar-closed group at Ellel is **96.4 per cent structural zero**
+  (108 of 112 Mon/Tue days over the 392-day filled calendar took nothing). A closed day gives an
+  actual and a forecast of both zero, hence an absolute residual of exactly zero, so the group's
+  score distribution carries a large atom at zero and the
+  `ceil((n+1) x 0.90)`-th smallest score lands **inside that atom**. The quantile is therefore 0.00
+  and the band collapses. This is not the small-n attainability clamp: the pool is large, the
+  guarantee is available, and the quantile is correct. `appendix/pseudocode.tex:238-239`
+  (`app:conformal-bounds`) already documents the atom, and `results.tex:428-434` already prints its
+  mass at 0.152 / **0.556** / 0.173, both as grounds for withholding the two-sided coverage bound.
+  **What neither states is that the atom can drive the served band to zero width.**
+  *Traded versus not, which is what decides how serious this is.* **2 of the 12 days traded and are
+  guaranteed misses**: 2026-03-31 (Tuesday, revenue ex-VAT 120.67, 22 transactions) and 2026-04-06
+  (Monday, 230.85, 47 transactions), both banded [0.00, 0.00]. The other **10 are true structural
+  zeros**, degenerate but harmless, where actual and band are both zero. Only 4 Mon/Tue days in
+  Ellel's entire 392-day history traded at all, and 2 of those 4 fall inside this window.
+  *Scope, stated because the count depends on it.* Report 96 reported 12 at one level and one
+  model. Across every level and model the store holds **72** zero-width L1 conformal rows at Ellel
+  (28 + 44 for `conformal_rung2_ets` at 0.90 / 0.80, 16 + 16 for the stale
+  `conformal_rung1_robust_dow`), and **zero at the other two venues**. The L2/L3 `mint_dowmedian`
+  rows that are also zero-width are a different construction (per hierarchy node, not calendar
+  grouped) and are not this flag.
+  *Not repaired, deliberately.* Changing the served band regenerates every downstream artefact and
+  invalidates reported numbers three weeks before submission. Same disposition as FLAG-PD1's
+  unguarded deviation path: recorded, described, left in place.
+  *What a repair would require, after submission.* A floor on the group quantile (serve the
+  marginal quantile when the group quantile is zero, which is what `compute/forward.py:203-216`
+  already does for a group below `MIN_CALIB_RESIDUALS`, but keyed on a degenerate quantile rather
+  than a thin pool); or dropping the partition at this venue; or a non-zero minimum half-width. Each
+  changes the served band and so re-opens the coverage numbers, which is why none is done now.
+  *No reported number reads these rows.* The `bands` table has exactly two readers outside the
+  tests, `service/app.py:206` and `:213`, both inside `GET /forecast`. Enumerated by grep over the
+  whole tree for `read_band`, `FROM bands` and the quoted table name, and separately over
+  `figures/`, which reads `l1_daily` only. No chapter or appendix figure is affected.
+
 - **FLAG-BAND-HORIZON research note (retained; superseded by the CLOSED entry above).** The served
   conformal band is
   calibrated on **≤7-step-ahead errors** and is only valid there. The residual stream

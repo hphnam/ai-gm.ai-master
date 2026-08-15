@@ -285,6 +285,24 @@ and there both do. Recorded as measured; no verdict drawn, because the served
 band's justification is conditional coverage rather than marginal coverage and
 this table speaks only to the latter.
 
+> **POINTER, appended 2026-08-15 (S22, decision row 115). The condition this refusal
+> names has been met, and the refusal is discharged at the Beer Hall only.**
+> `log/95_mondrian_aci.md` section 7.3 is the conditional-coverage measurement this
+> table lacked. On the Beer Hall's `closed_traded` cell, **n = 94**, the unpartitioned
+> arm, the AgACI unpartitioned arm and the occurrence **ORACLE** arm all land on **87 of
+> 94, coverage 0.9255 [0.853, 0.970], identically**, against the served Mondrian arm's
+> 0.4894 [0.385, 0.595]. So on the cell the partition is charged with breaking, not
+> partitioning at all is exactly as good as knowing the answer.
+>
+> **Do not read this as a verdict in one direction.** `chapters/results.tex` Table
+> `tab:winkler` has the partitioned arm beating the unpartitioned arm at all three
+> venues (1807 against 1940, 1263 against 1435, 646 against 654), and the Winkler score
+> is the criterion this project's adoption rule reads. Winkler penalises width; coverage
+> on a cell does not. **The arbitration is unresolved and belongs to a served-band
+> review**, and it is the same review that owns `FLAG-BAND-UNDERCOVERAGE-BH`. Full
+> reasoning at `log/96_served_partition_and_c7_placement.md` section 2 and
+> `log/97_degenerate_bands_and_honest_pricing.md`.
+
 ---
 
 ## 7 · Artefact schema

@@ -3651,3 +3651,93 @@ them into the append-only log so it is the continuous WP1-to-present record.
      **(m) Nothing was pushed.** No `.tex`, `.bib` or figure was touched; the Overleaf remote is
      unchanged. Nothing served or evaluated was modified and the arm is a leaf: `rg` finds
      `mondrian_aci` referenced in exactly two files, its own module and its own test.
+
+114. **S22: the served band at Ellel is zero width on twelve days, two of them days the venue
+     took money, and it is recorded rather than repaired.**
+     **(a) The rows.** Twelve band rows at Ellel, level 0.90, model `conformal_rung2_ets`, with
+     `hi - lo` exactly 0.00, every one a Monday or Tuesday, 2026-03-30 to 2026-05-05. S21 report 96
+     found them; S22 enumerated them with their realised values.
+     **(b) The split S21 did not report, which is what decides the severity.** **Two of the twelve
+     traded and are guaranteed misses**: 2026-03-31, revenue ex-VAT 120.67 on 22 transactions, and
+     2026-04-06, 230.85 on 47 transactions, both banded [0.00, 0.00]. The other ten are true
+     structural zeros where actual and band are both zero, degenerate but harmless. Only **4** of
+     Ellel's 112 calendar-closed days across its whole 392-day history traded at all, and two of
+     those four are in this window.
+     **(c) The mechanism, measured not assumed.** Ellel's calendar-closed group is **96.4 per cent
+     structural zero**, 108 of 112. A closed day gives an actual and a forecast of zero, hence an
+     absolute residual of exactly zero, so the group's score distribution carries an atom at zero
+     large enough that the `ceil((n+1) x 0.90)`-th smallest score falls inside it. **This is not
+     the small-n attainability clamp**: the pool is large, the guarantee is available, and the
+     quantile is correct. The band is a correct quantile of a degenerate group.
+     **(d) The document already carries the cause and not the consequence.**
+     `appendix/pseudocode.tex:238-239` states the atom, and `results.tex:428-434` prints its mass at
+     0.152 / 0.556 / 0.173, both as grounds for withholding the two-sided coverage bound. Neither
+     says the atom can drive a served band to zero width.
+     **(e) A scope correction to report 96.** Report 96's twelve is one level and one model. Across
+     every level and model the store holds **72** zero-width L1 conformal rows at Ellel and **none**
+     at the other two venues. Both figures are reported; neither was adopted silently.
+     **(f) Not repaired, and the reason.** Changing the served band regenerates every downstream
+     artefact and invalidates reported numbers three weeks before submission. Same disposition as
+     the unguarded deviation path at row 107. A post-submission repair would need a floor on the
+     group quantile, or the partition dropped at this venue, or a minimum half-width; each changes
+     the served band and re-opens the coverage numbers.
+     **(g) Nothing downstream reads them.** The `bands` table has exactly two readers outside the
+     tests, both inside `GET /forecast` (`service/app.py:206`, `:213`). Enumerated by grep over the
+     whole tree and separately over `figures/`, which reads `l1_daily` only. No reported number in
+     `chapters/` or `appendix/` is affected.
+     **(h) Flag.** `FLAGS.md`, `FLAG-BAND-DEGENERATE-ELLEL (OPEN, recorded not repaired)`.
+     Report: `log/97_degenerate_bands_and_honest_pricing.md`.
+
+115. **S22: report 86 section 6.3's refusal is discharged at the Beer Hall, the pointer is at the
+     refusal, and the cheap C7 forms stop being cheap once they are honest.**
+     **(a) The refusal, and why it expired.** Report 86 section 6.3 declined a verdict on the
+     unpartitioned band with its reason stated: *"the served band's justification is conditional
+     coverage rather than marginal coverage and this table speaks only to the latter."* Report 95
+     section 7.3 is that conditional measurement. **A refusal with a named cause is a live
+     obligation whose trigger is the arrival of that cause**, and nothing pointed forward to say
+     the trigger had fired.
+     **(b) The pointer is at the deferral site**, per the S19 amendment at `PRJ93_RULES.md:223`:
+     appended immediately after the refusing sentence in `log/86_c7_partition_contrast.md` section
+     6.3, not at the end of the section and not only here. It carries the discharge, the three arms
+     landing identically on 87 of 94, **and** the Winkler counter evidence, so it cannot be read as
+     a verdict in one direction.
+     **(c) The counter evidence, recorded wherever the supporting evidence is.**
+     `chapters/results.tex` Table `tab:winkler` has the partitioned arm beating the unpartitioned
+     arm at all three venues, 1807 against 1940, 1263 against 1435, 646 against 654, and the
+     Winkler score is the criterion the pre-registered adoption rule reads. **The arbitration is
+     unresolved and belongs to the served-band review that owns `FLAG-BAND-UNDERCOVERAGE-BH`**,
+     which S22 updated with both halves. It is not taken here.
+     **(d) The honesty question, answered against report 92's own standard.** Report 92 withdrew
+     form (a) because a reader could act wrongly on a form that was literally true. **Forms (d1) and
+     (d3) share that defect in kind and not in mechanism**: they mislead by omitting the criterion
+     the document itself uses to adjudicate, stated seventy lines later in the same chapter and
+     never connected. **So do (c) and (g)**, whose `0.880 above either` clause is the same
+     unqualified comparison. The defect belongs to the site.
+     **(e) The prices, in situ against site 8's applied replacement, whole-body instrument.**
+     Minimum clause that blocks the inference costs **+12** with its cross-reference and **+11**
+     without, the cross-reference being worth one word. **(d1-w) +21, (d3-w) +27, (c-w) +35,
+     (g-w) +35.** Baseline 19,993, margin +7.
+     **(f) Item 14 answered plainly. (d3-w) at +27 EXCEEDS the standing (c) at +23**, so on a
+     like-for-unlike comparison the cheap §7.3 form does not undercut the standing proposal once it
+     is made honest, and report 92's *"no cheap defensible middle"* is vindicated below +21. On the
+     like-for-like comparison, which is the honest one because (c) carries the same defect, the
+     §7.3 forms undercut by **14** and **8**. Both readings are reported; neither is preferred here.
+     **(g) The passage nobody had priced. `methodology.tex:511-515` is FALSE as written**, not
+     merely weakened. *"a closed venue's near-zero residuals cannot shrink a trading day's
+     interval"* is true under a calendar-open reading of *"trading day"* and false under the
+     trading reading its own words carry, at 94 days at the Beer Hall, 21 at Ellel and 38 at Two
+     River Taps. `results.tex:608-609` already asserts the negation, so **the document contradicts
+     itself**, and it did so before site 8 was applied. The paragraph governs 62 words and the
+     Mondrian clause 23.
+     **(h) The minimum repair is FREE.** Changing *"a trading day's interval"* to *"a calendar-open
+     day's interval"* prices at **exactly 0 words**, measured, and converts a false sentence into a
+     true one. **It is priced and NOT applied**, per the package.
+     **(i) The appendix sweep report 96 did not do.** `appendix/` carries three passages:
+     `app:mondrian` (`pseudocode.tex:241-256`), which assumes and is careful, separating what the
+     construction is from what it guarantees from what merely motivates it, and which is unaffected;
+     `app:conformal-bounds` (`:224-239`), which diagnoses the zero atom and is corroborated by row
+     114; and `robustness.tex:405-411`, which diagnoses and recommends nothing. **None recommends
+     group-conditional calibration and none is contradicted.**
+     **(j) Nothing was applied, repaired or turned off.** No `.tex` file was edited, no reduction
+     made, no served path changed, no partition disabled anywhere, no test removed, no numbered row
+     edited. The Overleaf remote is unchanged at `fbf64a2`.
