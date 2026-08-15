@@ -1924,6 +1924,15 @@ them into the append-only log so it is the continuous WP1-to-present record.
     project must not rely on -- while the inferential answer every conclusion does rest on is
     metric-invariant. **G1 remains the human's decision and is deliberately left open.** Evidence:
     `log/63_R4_metric_ordering_result.md`.
+    **FORWARD POINTER, appended 2026-08-15 (S19). G1 was DECIDED at row 79 and EXECUTED at
+    row 92. This row is closed.** G1 is D-D1, the MASE-versus-RMSSE headline. Row 79 records
+    the operator's decision; row 92 implements it, flipping the headline designation to RMSSE
+    with MASE labelled secondary, and declares it in `sec:res-mcs` as a post-hoc deviation from
+    row 33's pre-registration rather than absorbing it. **No model was re-run and no set
+    recomputed** at row 92, which is consistent with this row's own finding: both losses were
+    already stored on every fold, and the confidence sets are metric-invariant, so the flip
+    changes a designation and not a result. Note the sequencing trap this row's twin caused:
+    row 91 flagged D-D1 as still unimplemented four rows after it had been decided.
 
 76. **The five DIVERGES--DEFENSIBLE rows are reserved to the human and none was decided by the
     agent.** D-D1 the MASE/RMSSE headline (now evidential, see 75); D-D2 Ellel scored on unscaled
@@ -1934,6 +1943,16 @@ them into the append-only log so it is the continuous WP1-to-present record.
     regime-appropriate and never entered in the ladder. Phase 8 must write the agreed
     justification for each into the methodology chapter, so each is presented separately with a
     recommendation and none is batched.
+    **FORWARD POINTER, appended 2026-08-15 (S19). All five were DECIDED, one row each, and all
+    five are WRITTEN. This row is closed.** D-D1 at row 79 (RMSSE adopted from the estimand),
+    executed at row 92; D-D2 at row 80 (Ellel stays on unscaled MAE, argued from the estimand
+    and not from the unelicited cost parameters); D-D3 at row 81 (accept and reclassify, the
+    row's own premise about `p_trade` being false); D-D4 at row 82 (accept the design, fix the
+    attribution, and not by the route this row proposed); D-D5 at row 84 (attempted and aborted
+    on a pre-registered licence condition). The "presented separately, none batched" requirement
+    was met at row 91, which writes each into its own section: `sec:ruler-functional`,
+    `sec:ruler-ellel`, `sec:occurrence`, `sec:conformal`, and `sec:ladder` plus `sec:rw-rhythm`.
+    Row 95 then re-verified all five against the live chapter text rather than against this log.
 
 77. **PRE-REGISTRATION — the functional minimal pair (`rung1_mean_dow`), written before any code
     was touched (2026-08-05).** Append-only; corrections to this row go as new forward-pointer
@@ -2314,6 +2333,21 @@ them into the append-only log so it is the continuous WP1-to-present record.
     make `config.VENUE_SCALE_BASIS` the single authority, demote `REPORTED_BASIS` to a
     fallback, re-score `tab:ladder`; costs a re-score and moves published MASE by ~20%.
     Strengthens D-D1's rule from the other side — the basis alone is worth 24%.
+    **FORWARD POINTER, appended 2026-08-15 (S19). The (d) gate was DECIDED at row 87
+    (Gate A, same day) and COMPLETED at row 88. This row is closed.** Nothing above is
+    edited; the "NOT RESOLVED" sentence is what was true when it was written. Row 87
+    makes `config.VENUE_SCALE_BASIS` the single authority and demotes `REPORTED_BASIS`
+    to a documented fallback carrying the 1.2417x / 1.1361x divergence in its comment;
+    row 88 records the `eval.fold_vectors` regeneration finishing and the MCS re-run,
+    with the new/old ratio uniform across all nine rungs, which is what proves it a
+    denominator swap and not a model change. **Do not relay this row as an open
+    blocker.** It was relayed as exactly that on 2026-08-06, as the highest-priority
+    open item gating a figure programme and a day of compute, two rows after it had
+    been ruled; `PRJ93_RULES.md` §"Verify OPEN claims against the store that owns them"
+    is written about that incident and about this row. One scope correction travels
+    with the pointer: row 87 withdraws the "~20% movement" framing, because Ellel is
+    ruled `unscaled` and its rows become MAE in GBP, a structural change to the table
+    rather than a rescale.
     **(e) Provenance stamping done (item 8).** `eval/interval_calibration.py` now writes
     `provenance.runtime_stamp()` into the vectors JSON and `stamp_lines()` into the report
     footer. Re-ran in `.venv-forecast`: the artefact diff is **purely additive — not one
@@ -2394,6 +2428,15 @@ them into the append-only log so it is the continuous WP1-to-present record.
     **Still owed:** `tab:ladder` re-score (blocked on the running regeneration), D-F6 threat
     model, V1/V3, D-D1/D-D2/D-D4/D-D5 methodology paragraphs, and the gate-4 table-or-chart
     decision.
+    **FORWARD POINTER, appended 2026-08-15 (S19). Every item on this "Still owed" list is
+    DISCHARGED. This list is closed; read it as a record, not as a queue.** Item by item: the
+    `tab:ladder` re-score at row 88 (regeneration finished, 2511s, exit 0) and then RETRACTED at
+    row 89, which establishes the re-score was never owed at all because `tab:ladder` is the
+    frozen six-origin committed gate and the vectors feed `tab:mcs`; the gate-4 table-or-chart
+    decision at row 89 (small multiples, three panels), built as `fig:ladder` and pushed at
+    row 90; D-F6, V1, V3 and all four methodology paragraphs at row 91. Row 95 re-audited each
+    against the live chapters. **This list was copied forward twice, shortened each time, into
+    rows 88 and 90, and neither copy pointed anywhere either** -- see the pointers there.
 
 88. **Gate A completed — ruler migration re-scored, MCS re-run.** (`log/70`)
     The `eval.fold_vectors` regeneration finished (2511s of Chronos, exit 0). Fold counts are
@@ -2423,6 +2466,14 @@ them into the append-only log so it is the continuous WP1-to-present record.
     its mean at every rung, so a bare mean column is not defensible presentation.
     **Still owed:** `tab:ladder` push + gate 4, D-F6 threat model, V1/V3, and the
     D-D1/D-D2/D-D4/D-D5 methodology paragraphs.
+    **FORWARD POINTER, appended 2026-08-15 (S19). Every item on this "Still owed" list is
+    DISCHARGED. This list is closed; read it as a record, not as a queue.** The `tab:ladder`
+    push is not owed: row 89 establishes the table is the frozen six-origin committed gate and
+    needs no re-score, and row 90 records it left deliberately untouched. Gate 4 was answered at
+    row 89 (small multiples, three panels) and built and pushed as `fig:ladder` at row 90.
+    D-F6, V1, V3 and the four methodology paragraphs landed at row 91, each in its own section.
+    Row 95 re-audited each against the live chapter text. **This is the second of three copies
+    of the same list** (row 87 above, row 90 below), each shorter, none pointing forward.
 
 89. **Scoping correction: the regenerated vectors are `tab:mcs`, not `tab:ladder`.** (`log/70` S8-S11)
     Carried across several sessions as "re-score `tab:ladder`". Reading the live Overleaf section
@@ -2473,6 +2524,14 @@ them into the append-only log so it is the continuous WP1-to-present record.
     **`tab:ladder` deliberately untouched** -- row 89 establishes it is the frozen six-origin
     committed gate.
     **Still owed:** D-F6 threat model, V1/V3, D-D1/D-D2/D-D4/D-D5 methodology paragraphs.
+    **FORWARD POINTER, appended 2026-08-15 (S19). Every item on this "Still owed" list was
+    DISCHARGED at the very next row, 91. This list is closed.** Row 91 writes D-F6 into
+    `sec:chatlog` (correcting the pack's over-generous draft before writing it), V1 and V3 into
+    `sec:rw-ruler`, D-D1 into a new `sec:ruler-functional`, D-D2 into a new `sec:ruler-ellel`,
+    D-D4 into `sec:conformal` (which also closes V2), and D-D5 into `sec:ladder` and
+    `sec:rw-rhythm`. Row 95 re-audited all of them against the live chapters rather than
+    against this log, and found them present. **This is the third and last copy of the list
+    first written at row 87**; it was shortened at each copy and never once resolved in place.
 
 91. **D-F6, V1, V3 and the four defensible-divergence paragraphs written into the chapters.**
     Seven further Overleaf commits.
@@ -2513,6 +2572,16 @@ them into the append-only log so it is the continuous WP1-to-present record.
     primary loss) and `sec:rw-ruler` already carries the tension as a limitation. Flipping the
     headline metric is a methodology change and a human gate, so the evidence was written in
     **without** flipping it. Needs an operator decision.
+    **FORWARD POINTER, appended 2026-08-15 (S19). The operator decision was made at the very
+    next row, 92, and the headline is flipped to RMSSE. The conflict is closed.** Read the
+    conflict as this row states it, though: **the decision itself was not missing.** It had been
+    recorded at row 79, twelve rows earlier, as "D-D1 RESOLVED, RMSSE adopted as headline,
+    argued from the estimand". What was missing was its implementation in the chapters, and
+    row 92 supplies that as a change of designation over artefacts already on disk, with no
+    model re-run and no set recomputed, declared in `sec:res-mcs` as a post-hoc deviation from
+    row 33's pre-registration. **This row is the reason the pointer rule exists**: a decided
+    question read as undecided because row 79 carried no pointer forward and row 75 carried
+    none either, so the chapters and the write-up pack disagreed for twelve rows.
 
 92. **Headline metric flipped from MASE to RMSSE (operator-approved this session).** (`log/71`)
     Implements D-D1's recorded decision, which row 91 had flagged as unimplemented. **No model
@@ -2578,6 +2647,21 @@ them into the append-only log so it is the continuous WP1-to-present record.
     section, so the counterfactual sits inline in `sec:res-mcs-functional` (the same convention
     as D-D2's further-work note in `sec:ruler-ellel`). It should move when the conclusion is
     written.
+    **DISCHARGE, appended 2026-08-15 (S19). The condition is met and the move was made.**
+    Verified in the live source at `origin/main` `fbf64a2`, not inferred from any later row.
+    `chapters/conclusion.tex` is now 260 lines and carries `\section{Further work}` at
+    `:202` with `\label{sec:further-work}` at `:203`. The counterfactual arrived there as the
+    last of the five smaller extensions, `conclusion.tex:240-241`: *"And a rule fixed in advance
+    for deciding when a pairwise separation should override a set retaining the incumbent
+    (Section~\ref{sec:res-mcs-functional})."* It is stated and cross-referenced back to its
+    source section, which is the form this row asked for. **One thing changed that this row
+    could not have anticipated:** the inline home moved too. `sec:res-mcs-functional`
+    (`results.tex:137`) was cut on 2026-08-13 and its working, the gate-versus-headline
+    argument, the two ties, the 3.27 and 1.80 standard errors and the Two River Taps closure,
+    now sits in `app:squared-loss`; only the finding and the verdict remain in the chapter. So
+    the further-work item points at a section that is a summary of what it used to point at,
+    and the working it rests on is one hop further away, in the appendix. That is sound but
+    worth knowing before quoting the chain. Nothing above this line is edited.
 
 94. **Swept every chapter for unlevelled confidence-set claims; added the aggregate coherence
     statement.**
@@ -2620,6 +2704,24 @@ them into the append-only log so it is the continuous WP1-to-present record.
     deferred to a discussion, and `chapters/conclusion.tex` is still the unedited template
     stub); **D-U6** (the Beer Hall exchangeability violation is still unidentified -- analysis,
     never third-party blocked). D-U8 is scope, also not third-party.
+    **DISCHARGE, appended 2026-08-15 (S19). All four of those are now closed in the chapters.**
+    Verified by reading the live source at `origin/main` `fbf64a2` and the compiled `main.aux`,
+    which is the standard this row itself set: what the chapters SAY, not what a ledger claims.
+    D-F8 at `sec:res-vuspr`, `results.tex:771`, section 4.5.2 on page 41. D-F7's writing half at
+    `sec:res-reconciliation`, `results.tex:157`, section 4.2.1 on page 30. D-U6 at
+    `sec:res-exchangeability`, `results.tex:520`, section 4.4.3 on page 37. C11 and C12, the two
+    that waited on the conclusion, at `sec:disc-divergences`, `discussion.tex:172`, section 5.2
+    on page 47: C11's directionless-instability adjudication at `discussion.tex:187`, C12's
+    Zaffran boundary-condition reading at `discussion.tex:200-206`.
+    **CORRECTION, and it is why this discharge was worth writing down.** The closure was already
+    recorded once, in `ledger/literature_conformance.md` section 15, and that record names the
+    wrong home for C11 and C12: it says `chapters/conclusion.tex` (written), with evidence
+    `sec:conclusion-reversal` and `sec:conclusion-adaptive`. **Neither label exists.** They are
+    absent from every `.tex` file and absent from `main.aux`, so they were never compiled and
+    were never real. The work was done; the location was recorded from the plan rather than from
+    the artefact. The two rows landed in the discussion, which is where C11 and C12 said they
+    must resolve in the first place, and not in the conclusion. Nothing above this line is
+    edited; the "still open" reading is what was true when it was written.
     *Correctly blocked on a third party:* D-U1, D-U2, D-U3, D-U4, D-U5, D-U7, and D-D5's
     `TABPFN_TOKEN` residue.
     *Four trails removed from `literature_review.tex`.* (1) `sec:rw-synthesis` still listed

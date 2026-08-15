@@ -28,4 +28,13 @@
 # at a different page and a different width (3.61pt then, 3.51pt now). Both sit
 # under the ceiling. Delete this line if a future edition of that sentence
 # breaks elsewhere.
-5.0 staff
+#
+# REPAIRED, line removed 2026-08-15 (S19) per the pruning rule above. The
+# S17 line break at the "ffi" ligature cleared the spill: the gate now returns
+# PASS at the canonical --body-from 21 scope with NO accept file in play, so
+# this line accepted nothing and was pure exposure. What it would have excused
+# is the point -- the substring is "staff", which appears throughout a
+# hospitality dissertation, so any FUTURE spill up to 5.0pt on any line
+# containing that word would have passed silently. Found in the S18 sweep
+# (log/93 part 5) and ruled here. Re-add only with a fresh measurement and a
+# narrower substring.

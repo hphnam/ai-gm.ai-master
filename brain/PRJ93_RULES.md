@@ -205,6 +205,46 @@ open because that is what was true when the line was appended. `BLOCKED_third_pa
 already read *"Open rows not blocked on a third party: 0"*. The check that would have caught
 it took seconds and was not done.
 
+#### AMENDMENT 2026-08-15 (S19): the rule above is now a mechanism, because as a disposition it failed
+
+**The paragraph above asks a reader to be careful, and that is why it did not work.** It was
+written about decision row **85**, the ruler conflict. It did not prevent the same failure
+three more times. Packages **S14, S15 and S16** each read Section B row 5, each verified that
+the dissertation omits the T3 fold-count divergence, and each priced a disclosure for it, when
+row 6(a) had resolved the divergence on 2026-07-08, about sixty rows further down under a
+different section heading. Decision row **111(d)** records that sequence. **A gap has two
+halves, the absent statement and the live fact it would state, and only the first was ever
+checked.** Three careful readers, one careful rule, three identical misses: the variable that
+predicts the miss is not care, it is whether a pointer exists at the place the reader arrives.
+
+**The rule is therefore replaced with a writing obligation on the deciding session, not a
+reading obligation on the next one:**
+
+> **When a deferral is decided, the pointer is appended at the deferral site, in the same
+> session as the decision.** Not at the end of the deferring row, not only in the new row that
+> records the decision, and not in a later sweep. At the site: adjacent to the sentence that
+> defers, where a reader who arrives by grep stops reading. The pointer names where the
+> decision was made and its row number. A session that records a decision without appending
+> that pointer has not finished the decision.
+
+Three properties this has and the old rule did not. It is **discharged by the party who knows
+the answer**, at the moment they know it, rather than by every future reader guessing that an
+answer might exist. It is **checkable**: a row that defers and carries no forward reference to
+a higher-numbered row is a mechanical query over the log, not a judgement. And it **costs the
+decider seconds and saves every later reader the same seconds**, which is the only ratio under
+which a discipline survives contact with a deadline.
+
+The pointer is an append, so it is fully inside the append-only rule below: nothing in the
+deferring row is edited, and the superseded text is left standing as the record of what was
+true when it was written. Placement matters and is not decoration, per the finding that a
+supersession announced a hundred lines below the text it supersedes is never read by anyone
+reading that text.
+
+**Retrofit status, 2026-08-15.** Eleven rows deferred without a pointer; the sweep is at
+`log/93` part 3. Pointers are now placed at Section B row 5 (S18) and at rows **75, 76, 85,
+87, 88, 90, 91** with discharges at **93** and **95** (S19). Rows **9** and **45** are left
+open deliberately, because their conditions have not been discharged; see `log/94` part 4.
+
 **Subagent findings of this shape do not pass through unchecked.** A subagent reporting an
 item as open has almost always read a history file, because history files are longer, more
 specific and easier to grep than the one-line state a status file carries. Verify before

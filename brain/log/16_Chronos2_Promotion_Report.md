@@ -339,3 +339,43 @@ should not be cited as such.
 forward pointer to row 6(a), and three later work packages (S14, S15, S16) priced a
 dissertation disclosure for a divergence that had already been resolved. Full
 account at decision log row **111(d)**; the pointer is now in row 5 itself.
+
+---
+
+## CORRECTION appended 2026-08-15 (S19): the no-em-dash claim at line 10 is false, and was false on the day it was written
+
+**The claim, verbatim, at `:10`:**
+
+> No em-dashes are used in this report, per the spec's style rule.
+
+**The measurement.** This file contains **29 U+2014 em dashes**, at lines 39, 46, 49, 62, 68,
+82, 84, 91, 102, 108, 111, 117, 130, 141, 147, 163, 168, 175, 181, 200, 202, 206, 213, 220,
+221, 249, 257, 273 and 274. All 29 sit in the report's **own prose**, not one inside a
+blockquote, a table cell or a code span, so no reading of the claim as scoped to original
+sentences rescues it. Every one of them falls before line 293, which is where the first
+appended correction begins, so all 29 date from the original 2026-07-08 authoring and none
+was introduced by a later append. The two appended correction sections carry zero.
+
+**What this is and is not.** The style rule was real and it was stated. What failed is that
+the compliance line was **written rather than measured**: it asserts an outcome about the file
+it sits in, at a point in the file where nothing had yet been counted, and nothing downstream
+ever counted it either. A statement of the form "this artefact satisfies rule X" placed inside
+the artefact is a claim, and it is exactly as checkable as any other claim in this project,
+which is to say it should have been run before it was written. It survived from 2026-07-08 to
+2026-08-15 in a project that runs an AI-writing pre-flight on every prose deliverable, because
+the pre-flight runs over the dissertation `.tex` and not over the build reports.
+
+**What still stands.** Nothing else in this report is touched or affected. The em dashes are a
+style-rule breach and a false self-report; they change no number, no gate, no verdict, and no
+finding. The body is left exactly as written, per the append-only correction rule at
+`PRJ93_RULES.md` "Corrections are appended, never overwritten".
+
+**Sibling claims checked, since the rule is to grep for the claim rather than for the file it
+was written in.** Three other files assert a zero-em-dash result and contain em dashes.
+`ledger/phase_state.md` (574) and `log/Decision_and_Resolution_Log.md` (76) are **not in
+breach**: every one of their claims is scoped to a named `.tex` deliverable or chapter, not to
+the ledger prose carrying it. `log/30_G12_18_Comment_Rewrite_Report.md:6` says *"Zero
+em-dashes in the edits or in this report"* and the file holds 215, but that report's subject
+IS em dashes and the 215 are quoted BEFORE-samples of the comments it rewrote, each prefixed
+with its source line number. Defensible, and worth a scoping clause it does not have. **This
+report is the only one of the four where the claim is simply untrue.**
