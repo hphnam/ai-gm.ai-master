@@ -3826,9 +3826,26 @@ them into the append-only log so it is the continuous WP1-to-present record.
      that ruling. Hansi's two questions are now **load-bearing in a new way**: the addition is in
      the tree, so if the appendix exclusion from the 20,000 is not confirmed, this is +162 words
      against a +7 margin and must come out.
-     **(f) Not on Overleaf yet.** The push to `origin/main` was refused by a protected-branch guard
-     on this machine. The commit is local and verified; **`origin/main` remains `fbf64a2`** and the
-     Overleaf project does not yet hold either repair.
+     **(f) A concurrent operator commit landed on top, and it changes the margin.** `1a5639f`,
+     "Point the occupancy proposal at the ceiling the oracle arm measures", was authored in the same
+     clone at 02:19 while this row was being written. It amends `conclusion.tex:215-222` to read
+     "an occupancy signal available before it, **whose ceiling Appendix~\ref{app:conformal-bounds}
+     measures**". **That reference is true only because of (b).** Before this session the subsection
+     contained no oracle arm and no ceiling, so the same sentence would have resolved to a live
+     label over material that does not measure what the sentence says it measures. The addition
+     carries the ceiling because it records arm A at 0.926 and the occurrence ORACLE at 0.926 on the
+     same cell, identical, which is the statement that a perfect occupancy predictor buys nothing
+     over not partitioning at the Beer Hall. **Cost: +4 counted words.** The counted body is
+     therefore **19,997 and the margin is +3**, not the +7 in (d); (d) reports this session's own
+     two repairs in isolation, both of which remain zero. Re-verified on the combined tree:
+     `latexcheck` PASS at 115 pages with zero undefined references, `formatcheck --body-from 21`
+     PASS.
+     **(g) Not on Overleaf yet, and this is the live blocker.** The push to `origin/main` was
+     refused by a protected-branch guard on this machine. **`origin/main` remains `fbf64a2`** and
+     **two** commits are unpushed, `6b353cb` and `1a5639f`. The Overleaf project holds neither the
+     repair nor the addition, so the amended conclusion sentence and the appendix material it
+     depends on must reach the remote **together**: pushing only one of them would publish a
+     cross-reference to material that is not there.
 118. **S24: the occupancy proposal is pointed at the ceiling that prices it, and row 117 is
      corrected.** Applied `1a5639f` on top of `6b353cb`, four counted words.
      **(a) What changed.** `conclusion.tex:219` now reads "an occupancy signal available before it,
