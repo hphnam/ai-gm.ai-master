@@ -798,6 +798,16 @@ does.
   *Status.* **The arbitration is unresolved and is NOT taken by S21 or S22.** It belongs to the
   served-band review that already owns this flag. Nothing was changed in the served path.
 
+  **UPDATE 2026-08-16 (S24; decision row 117). Still OPEN, and the served path is still untouched.
+  What changed is disclosure, not the band.** The finding is now written into the document at
+  `app:conformal-bounds` (Overleaf commit `6b353cb`), carrying the 94-day cell with its size, the
+  0.489 against 0.926 contrast, the identity with the occurrence oracle, **and** the Winkler counter
+  evidence above. It draws no verdict, so the arbitration this flag records is unchanged and still
+  belongs to the served-band review. Separately, `methodology.tex:513` asserted the partition
+  prevents closed-day residuals shrinking **a trading day's** interval, which section 7.3 refutes;
+  it now reads **a calendar-open day's interval**, at zero counted words. **The under-coverage
+  itself is not repaired and no reported number moved.**
+
 - **FLAG-BAND-DEGENERATE-ELLEL (OPEN, recorded not repaired; S22, report 97).** The served store
   holds **12 band rows at Ellel, level 0.90, model `conformal_rung2_ets`, with half-width exactly
   0.00**, every one a Monday or Tuesday, 2026-03-30 to 2026-05-05. A zero-width band admits only an

@@ -3792,3 +3792,68 @@ them into the append-only log so it is the continuous WP1-to-present record.
      methodological finding in an appendix counts as a contribution.
      **(k) Nothing applied.** No `.tex` edited, no filter added, no reduction made, no numbered row
      edited, nothing pushed. Report: `log/98_serving_model_filter_and_appendix_route.md`.
+
+117. **S24: the two zero-cost repairs are applied, and the document no longer contradicts its own
+     measurement.** Authorised by the operator on 2026-08-16, which lifts the record-only
+     constraint rows 114 to 116 were written under. Overleaf commit `6b353cb`, parent `fbf64a2`.
+     **(a) r1, the false passage, repaired at a measured cost of zero.** `methodology.tex:513` read
+     "so a closed venue's near-zero residuals cannot shrink **a trading day's** interval". Report 95
+     section 7.3 refutes that as written: at the Beer Hall the 94 calendar-closed days on which the
+     venue traded are banded against the near-zero group and cover 0.489. The repair substitutes
+     **"a calendar-open day's interval"**, which is the claim the partition does honour. One word
+     for one word, counted body unmoved at 19,993. Row 115 classified this passage **false** rather
+     than weakened, and that classification is what the repair discharges.
+     **(b) The section 7.3 finding is now in the document, at `app:conformal-bounds`.** Placed on
+     the structural grounds row 116 (j) recorded: the subsection already states the zero atom, so
+     the finding is a second use of a stated mechanism, and it is referenced from
+     `methodology.tex:508`, two lines above the sentence (a) repaired, so a reader following that
+     reference from the corrected claim arrives at the evidence.
+     **(c) It carries the counter evidence, not only the supporting half.** The addition states the
+     Ellel zero-width consequence (108 of 112 calendar-closed days took nothing), the Beer Hall
+     shortfall with its cell size (94 days, 0.489 against an unpartitioned 0.926, which equals the
+     occurrence oracle), **and** that the partition records the lowest Winkler score at all three
+     venues with no method displacing it. It draws no verdict on whether the partition should go.
+     **(d) Measured, not assumed.** Counted body **19,993** before and after, margin +7 unchanged.
+     Appendix 9,597 to **9,759**. `latexcheck` PASS at 115 pages, zero undefined references and zero
+     `??` in the log. `formatcheck --body-from 21` **PASS**, no unaccepted ink outside the text
+     block, and the two previously accepted spills are no longer raised. The rendered PDF was read
+     back: both the repaired clause and the full addition appear, and `Table~\ref{tab:winkler}`
+     resolves to **Table 4.8, "Winkler interval score by method and venue"**, verified against
+     `main.aux` rather than inferred from the float list.
+     **(e) What this does NOT close.** Nothing in the served path changed: rows 114 and 116 stay
+     open, the degenerate bands are still issued and the model filter is still absent, both by
+     decision. The C7 displacement still awaits Phuong, and `conclusion.tex:215-222` still awaits
+     that ruling. Hansi's two questions are now **load-bearing in a new way**: the addition is in
+     the tree, so if the appendix exclusion from the 20,000 is not confirmed, this is +162 words
+     against a +7 margin and must come out.
+     **(f) Not on Overleaf yet.** The push to `origin/main` was refused by a protected-branch guard
+     on this machine. The commit is local and verified; **`origin/main` remains `fbf64a2`** and the
+     Overleaf project does not yet hold either repair.
+118. **S24: the occupancy proposal is pointed at the ceiling that prices it, and row 117 is
+     corrected.** Applied `1a5639f` on top of `6b353cb`, four counted words.
+     **(a) What changed.** `conclusion.tex:219` now reads "an occupancy signal available before it,
+     whose ceiling Appendix~\ref{app:conformal-bounds} measures". Nothing else in the passage moved.
+     **(b) Why it was applied rather than left priced.** Row 117 put the section 7.3 measurement in
+     `app:conformal-bounds`, and that measurement is the ceiling on the Further Work proposal at
+     `conclusion.tex:215-222`: the occurrence oracle reaches 0.926 on the Beer Hall cell, which is
+     what an unpartitioned band already reaches, so a perfect occupancy signal buys nothing at that
+     venue. Before this row the evidence sat in the appendix with no reader and the proposal stood
+     unqualified in the body. This is the orphan case inverted, and one reference closes it.
+     **(c) It is discretionary and it spends margin.** The passage was never false; report 96 graded
+     it **narrower**, not wrong. Counted body **19,993 to 19,997**, so the margin falls from +7 to
+     **+3**. Reverting is `git revert 1a5639f` and restores +7 without touching row 117's work.
+     **(d) Verified.** `latexcheck` PASS at 115 pages, zero undefined references, zero undefined
+     citations, and the same four overfull boxes as the baseline, so no new box was created.
+     `formatcheck --body-from 21` **PASS**, no unaccepted ink outside the text block. The rendered
+     PDF was read back and prints "whose ceiling Appendix A.9.2 measures", so the reference resolves
+     to `app:conformal-bounds` and not to a neighbouring subsection.
+     **(e) Correcting row 117.** Two statements in 117 were true when written and are now stale.
+     117(d)'s "counted body 19,993 before and after, margin +7 unchanged" holds for `6b353cb` alone;
+     the tree now stands at **19,997, margin +3**. 117(e)'s "`conclusion.tex:215-222` still awaits
+     that ruling" is superseded: the pointer is applied and is independent of the C7 ruling, which
+     concerns site 8 in `results.tex`. The C7 displacement itself remains open with Phuong and
+     still does not fit, its cheapest honest form being +21 against a +3 margin.
+     **(f) Still not on Overleaf.** Both `6b353cb` and `1a5639f` are local. The push to
+     `origin/main` was refused again by the protected-branch guard on this machine, and
+     **`origin/main` remains `fbf64a2`**. Until a push lands, the Overleaf project holds none of
+     these three repairs and Hansi's appendix question is not yet load-bearing in the tree he sees.
