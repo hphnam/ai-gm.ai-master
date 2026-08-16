@@ -3874,3 +3874,83 @@ them into the append-only log so it is the continuous WP1-to-present record.
      `origin/main` was refused again by the protected-branch guard on this machine, and
      **`origin/main` remains `fbf64a2`**. Until a push lands, the Overleaf project holds none of
      these three repairs and Hansi's appendix question is not yet load-bearing in the tree he sees.
+
+119. **S25 correction: D24's superset guarantee no longer holds, and the entrant it protected now
+     scores at no venue.** Recorded, not repaired. No report regenerated, no backend installed.
+     **(a) What D24 promised.** `log/15_Fidelity_Corrections_Addendum_Report.md:118-121`: "Prophet
+     installed into the eval venv. So the committed ladder reports are a proper superset (prophet
+     plus both Chronos entrants). Without it the eval-venv reports would drop the prophet rows the
+     runtime reports carry." The guarantee is that the committed artefacts are the wider set.
+     **(b) It is false as the reports now stand.** All three of
+     `models/ladder_results_L1_{beer_hall,ellel,two_river_taps}.md` carry
+     `| 2 | rung2_prophet | - | - | backend not installed |` in **both** the rolling and the static
+     regime, so the entrant scores at **no venue in either regime**. The reports hold ten entrants
+     and nine scores. The Chronos half of D24 still holds: `rung4_chronos2`, `rung4_chronos2_exo`
+     and `rung4_chronos_bolt` are all present and scored in the rolling regime at all three venues.
+     **(c) The commit that regenerated them.** **`a04eb2d6`, "expand ellel forecasting rung",
+     hapuna-namhoang, 2026-07-08 19:20:09 +0100.** Immediately before it, at `a0fbd64e`, the
+     entrant scored: Beer Hall $0.799$ rolling and $0.824$ static, Two River Taps $0.709$ rolling,
+     Ellel capped at Rung 1 alongside `rung2_ets`. Earlier still, at `d4f347d9`, the Beer Hall
+     report named it the winner outright: "best model: **rung2_prophet** (MASE 0.799)". The same
+     commit uncapped Ellel's Rung 2, taking `rung2_ets` there from the Rung-1 cap to $0.825$, which
+     is what the commit message names. `c4efe3cc` and `01b77db1` carried the state forward.
+     **(d) No adopted model moves.** At `a0fbd64e`, with the entrant scoring, `rung4_chronos2_exo`
+     stood at $0.779$ against its $0.799$, so the served Beer Hall choice was already ahead of it on
+     the same folds. The loss is to the size of the field, not to any selection.
+     **(e) One coincidence checked and ruled out.** Beer Hall `rung2_ets` moved $0.825$ to $0.799$
+     across the same commit, landing exactly on the entrant's former value, which would be the
+     signature of a row shift. It is not one: at Two River Taps the old pair was ets $0.584$ and
+     entrant $0.709$, and the regenerated ets is $0.597$, which is neither. Several other values
+     moved in the same regeneration (`rung3_global_gbm` $0.905$ to $0.920$, `rung4_chronos2_exo`
+     $0.779$ to $0.745$), so the Beer Hall match is coincidence.
+     **(f) D25 is unaffected.** It speaks to the Rung-4 rows being the backend-present artefacts,
+     and those rows are present. Only D24's prophet limb fails.
+     **(g) Not repaired.** No backend installed and no report regenerated, because regenerating
+     would move committed figures that `chapters/` and `appendix/` already cite. The document-side
+     consequence is priced in report 99 and applied nowhere.
+
+120. **S26: three appendix placements applied at zero counted cost, the static-regime disclosure
+     priced and refused a home, and two corrections to row 119.** Overleaf `1a5639f` at start,
+     nothing pushed. Counted body **19,997 unchanged**, margin +3; appendix 9,759 to 10,241.
+     **(a) Applied.** The Prophet record at `appendix/tables.tex` after `tab:ladder` (+281
+     appendix, +0 counted); the L2/L3 scope reasoning at that appendix's Reconciliation
+     corrections section (+170, +0); the oracle labelled unavailable at forecast time inside
+     `app:conformal-bounds` (+31, +0); and two stale appendix-letter header comments (+0). Every
+     delta is a whole-body difference on a throwaway copy, and the three prose deltas sum to the
+     482 the appendix total moved.
+     **(b) The §7.3 form was already live and failed the new bar.** S24 placed it at `6b353cb`
+     carrying the Winkler counter evidence but naming the oracle only as an oracle. S26's package
+     required it labelled **unavailable at forecast time**, which no form in report 98 had, and
+     report 98 had checked for the weaker property and passed them. The label was added rather
+     than the form withdrawn.
+     **(c) The static-regime disclosure has no free home.** `methodology.tex:375-376` states the
+     adoption principle with no regime attached; the two Results passages scope themselves in
+     their own text and do not over-claim. An appendix is excluded because a body claim qualified
+     only in an appendix is still unqualified, and Limitations is excluded because it sits
+     twenty-nine printed pages below the sentence it would qualify (§3.6 page 20 against §5.4
+     page 49, both read off `main.aux`). So the clause must go in the body and
+     must be paid for.
+     **(d) Nothing fits.** Baseline margin +3. The cheapest wording that names the regime at all
+     is a four-word prepositional phrase at **+4**, one over the cap. The re-measured RQ4
+     de-duplication buys **12 words, not report 92's 16**, and its splice was rebuilt from scratch
+     because 92's was not recoverable. With it, the bare scope phrase fits at +11 reserve and the
+     minimal form lands at exactly zero. The first form that discloses the actual defect, that the
+     served arm returns no forecast at all outside the rolling protocol, is +31 and stays 16 words
+     out of reach. **Priced in report 99 and applied nowhere**; this needs a ruling, not a session.
+     **(e) Two corrections to row 119.** Its clause (e) puts `rung4_chronos2_exo` 0.779 to 0.745
+     among the values that moved in the same regeneration. That move is `c4efe3cc`, a later
+     change; at `a04eb2d6` the arm was still 0.779, which is why 0.779 and not the document's
+     0.745 is the honest comparator against the entrant's 0.799. The row's conclusion stands,
+     since the row shift is ruled out on the Two River Taps pair. And **the guarantee was never
+     true at Ellel**: `a04eb2d6` uncapped that venue's rungs and dropped the backend in one
+     change, so Ellel's Rung 2 to Rung 4 rows have only ever existed without the entrant. Row 119
+     is not edited, per the package.
+     **(f) Verification.** `latexcheck` PASS, zero errors, zero undefined references, zero
+     undefined citations, zero floats lost. `formatcheck --body-from 21` PASS. Against a
+     controlled rebuild of `1a5639f` in the same session, the overfull and underfull box
+     populations are **identical, list for list**, 4 and 14; pages 115 to 116. No page limit is
+     stated in the issued documentation, and `knowledge/00_marking_criteria.md:405` still carries
+     the question unstruck. Suite **green: 667 passed, 1 skipped, 0 failed, exit 0**, the network
+     test deselected by node id and the counts taken as a census of the progress marks, 668 run
+     against 669 collected minus 1 deselected, because this config prints no `N passed` line. The
+     store-ceiling assertion did not run and nothing was installed to make it.
