@@ -3741,3 +3741,54 @@ them into the append-only log so it is the continuous WP1-to-present record.
      **(j) Nothing was applied, repaired or turned off.** No `.tex` file was edited, no reduction
      made, no served path changed, no partition disabled anywhere, no test removed, no numbered row
      edited. The Overleaf remote is unchanged at `fbf64a2`.
+
+116. **S23: the serving path has no model filter, so a retired model is still served, and the
+     section 7.3 finding costs zero counted words if it goes in an appendix.**
+     **(a) The defect, and why it is a different class from row 114.** Row 114 is a correct
+     quantile of a degenerate group. This is **correct output from a superseded model being served
+     as current**. `store/warehouse.py:402-427` and `service/app.py:229-247` filter on venue, layer
+     and level and **not on model**; the upsert key includes `model` (`warehouse.py:347`) so a new
+     model's rows are added beside the old rather than replacing them; and `served_forecast` and
+     `ladder_selection` are **both empty in the store**, so nothing records which model is current
+     for a filter to read.
+     **(b) What it returns, measured.** L1 at level 0.90: Ellel **214 rows over 100 dates from 3
+     models**, 57 dates answered by all three; Beer Hall **151 rows over 94 dates from 2 models**,
+     57 dates by both; Two River Taps 85 over 85 from one, clean.
+     **(c) The worked case.** 2026-04-06 at Ellel is one of row 114's two guaranteed misses, actual
+     230.85 on 47 transactions. The endpoint returns **three mutually contradictory answers for that
+     single day**: `rung1_robust_dow` [0.00, 0.00], `rung2_ets` [0.00, 0.00], `rung3_gbm`
+     [758.80, 836.45]. All three miss, two from below and one from above, and nothing in the
+     response lets a caller choose.
+     **(d) Which is retired.** `MAX_RUNG` is `{}` at `config.py:151`, so `default_model('ellel')`
+     resolves to `rung2_ets`. The stale `rung1_robust_dow` rows are why row 114's count is 12 at one
+     scope and 72 across all four.
+     **(e) The compute path does not share it.** `compute/engine.py:192-196` resolves exactly one
+     served model per venue and `compute/forward.py` bands only that one, in memory. **Single-model
+     by construction on one path and not on the other.**
+     **(f) One endpoint reaches it.** `GET /forecast`. The deviation endpoints compute their own
+     half-band from the residual stream and never read the table; the briefing consumes the
+     deviation feed.
+     **(g) Not repaired.** Adding the predicate changes served output, and the repair needs a source
+     of truth for "current model" the store does not hold. Same disposition as rows 107 and 114.
+     **(h) No published number is affected, and the check is scoped.** The `bands` table has exactly
+     two readers outside the tests, both inside `GET /forecast`. Every coverage figure in the
+     document is computed in memory by `eval/interval_calibration.py` or `conformal.wrap.evaluate`
+     and lands in a JSON artefact. `figures/` reads `l1_daily` only, via `fig_estate.py`;
+     `eval/chronos2_promotion_sensitivity.py:9` states in its own docstring that it *"never reads
+     `served_forecast`, `forecasts`, or `bands`"*.
+     **(i) The appendix route, priced and NOT applied.** The section 7.3 finding placed against
+     `app:conformal-bounds` costs **+0 counted words**, confirmed by measurement and not by
+     assumption: the canonical `\bodywordcount` scope is six chapters plus `abstract.tex` and
+     excludes `appendix/`, and the body reads 19,993 with every form spliced. The appendix's own
+     total moves from **9,597** to 9,659 (minimal) or 9,756 (full); at `app:mondrian`, to 9,657 or
+     9,712. **9,597 independently reproduces the appendix exposure report 92 section 5.1 quotes.**
+     **(j) Better home, on structure, and no placement recommended.** `app:conformal-bounds` is the
+     better of the two: it already owns the zero atom, so the finding is a second use of a mechanism
+     the section states rather than a new subject, and it is referenced from `methodology.tex:508`,
+     two lines above the passage row 115 found false. `app:mondrian`'s remit is provenance, what the
+     construction inherits and from where, and a measured cost is not inherited. **Whether anything
+     is placed at all is not decided here** and turns on two answers from Hansi that no session can
+     supply: whether the appendix exclusion from the 20,000 is confirmed, and whether a
+     methodological finding in an appendix counts as a contribution.
+     **(k) Nothing applied.** No `.tex` edited, no filter added, no reduction made, no numbered row
+     edited, nothing pushed. Report: `log/98_serving_model_filter_and_appendix_route.md`.

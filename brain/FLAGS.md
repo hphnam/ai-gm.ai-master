@@ -836,6 +836,53 @@ does.
   whole tree for `read_band`, `FROM bands` and the quoted table name, and separately over
   `figures/`, which reads `l1_daily` only. No chapter or appendix figure is affected.
 
+- **FLAG-SERVE-NO-MODEL-FILTER (OPEN, recorded not repaired; S23, report 98).** `GET /forecast`
+  returns bands from **every model ever persisted** for a venue, including retired ones, because
+  neither read path filters on model. This is a different class of defect from
+  `FLAG-BAND-DEGENERATE-ELLEL` above, which is a correct quantile of a degenerate group; this is
+  correct output from a superseded model being served as though it were current.
+  *The mechanism, in three parts.* (1) `store/warehouse.py:402-427` (`read_band`) and its L2/L3
+  twin `service/app.py:229-247` (`_read_band_with_key`) join `forecasts` to `bands` on
+  `f.model = b.model` and filter on venue, layer and level. **There is no model predicate, no
+  recency rule and no default.** (2) The upsert key includes `model` (`_BAND_COLS`,
+  `warehouse.py:347`), so writing a new model's rows **adds** them beside the old rows rather than
+  replacing them; the accumulation follows from the key, it is not a cleanup that was skipped.
+  (3) `served_forecast` and `ladder_selection` are **both empty in the store**, so there is no
+  persisted record of the current model that a filter could read even if one were added.
+  *What it returns today*, L1 at level 0.90, measured:
+
+  | venue | rows returned | distinct dates | models | dates answered by more than one model |
+  |---|---:|---:|---:|---:|
+  | ellel | **214** | 100 | 3 | **57** |
+  | beer_hall | **151** | 94 | 2 | **57** |
+  | two_river_taps | 85 | 85 | 1 | 0 |
+
+  *The worked case, which is the one that matters.* 2026-04-06 at Ellel is one of the two
+  guaranteed misses in `FLAG-BAND-DEGENERATE-ELLEL` (actual 230.85 ex-VAT on 47 transactions). The
+  endpoint returns **three mutually contradictory answers for that one day**: `conformal_rung1_robust_dow`
+  yhat 0.00 band [0.00, 0.00]; `conformal_rung2_ets` yhat 0.00 band [0.00, 0.00]; `conformal_rung3_gbm`
+  yhat 797.63 band [758.80, 836.45]. All three miss, two from below and one from above, and the
+  caller has no rule in the response to choose between them.
+  *Which model is retired.* `MAX_RUNG` is `{}` (`config.py:151`) post-G12.9c, so
+  `conformal.wrap.default_model('ellel')` resolves to `rung2_ets`. The 16 zero-width
+  `conformal_rung1_robust_dow` rows at level 0.90, plus 16 more at 0.80, are why the degenerate
+  count is 12 at one model-and-level scope and 72 across all four.
+  *The compute path does not share this.* `compute/engine.py:192-196` resolves exactly one served
+  model per venue (`dataset.prior_state.served_model`, falling back to `default_model`) and
+  `compute/forward.py` bands only that one, in memory. **The ComputeDataset path is single-model by
+  construction; only the DuckDB serving path is not.**
+  *Endpoints that reach it: exactly one.* `GET /forecast` (`service/app.py:193`), via lines 206 and
+  213. `/deviation/check` and `/deviation/scan` compute their own half-band from the residual
+  stream (`signals/deviation.py`) and never touch the table; `/briefing` consumes the deviation
+  feed, not the band table.
+  *Not repaired, deliberately.* Adding a model predicate changes what the service returns, which is
+  a served-output change three weeks before submission and outside what a recording package may do.
+  A repair also needs a source of truth for "current model" that the store does not presently hold,
+  since `served_forecast` and `ladder_selection` are empty. Same disposition as
+  `FLAG-BAND-DEGENERATE-ELLEL` and the unguarded deviation path.
+  *No reported number is affected.* Section 2 of report 98 enumerates the readers and the scope of
+  that check.
+
 - **FLAG-BAND-HORIZON research note (retained; superseded by the CLOSED entry above).** The served
   conformal band is
   calibrated on **≤7-step-ahead errors** and is only valid there. The residual stream
