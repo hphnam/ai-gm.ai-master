@@ -3954,3 +3954,64 @@ them into the append-only log so it is the continuous WP1-to-present record.
      test deselected by node id and the counts taken as a census of the progress marks, 668 run
      against 669 collected minus 1 deselected, because this config prints no `N passed` line. The
      store-ceiling assertion did not run and nothing was installed to make it.
+
+121. **S27: four rulings taken. The static-regime disclosure lands as a body clause plus an
+     appendix section, and the certification rule becomes a mechanism.** Overleaf `6643753` at
+     start, confirmed landed on `origin/main` by `git ls-remote` before anything was applied;
+     ends at `c34c266`, one ahead, not pushed. Counted body **19,997 to 19,989**, margin +3 to
+     **+11**; appendix 10,241 to 10,570; pages 116 to 116.
+     **(a) The rule.** `PRJ93_RULES.md` gains a dated amendment beneath *"Anything a critique log
+     claims to have applied is quoted, not named"*, which stands unedited: **a certification
+     quotes the requirement it discharges, verbatim, beside what was checked, and a certification
+     that paraphrases the requirement has not discharged it.** Written about the §7.3 oracle label
+     of row 120(b), where `log/98` certified on *"both name the oracle as an oracle"* against a
+     requirement reading *"unavailable at forecast time"*, and the gap stood on `origin/main`
+     through S25 and into S26. The existing rule already demanded quoting in four cases and a
+     report certifying a draft against a package requirement is none of them, so report 98
+     satisfied every bullet and paraphrased anyway. Same failure mode as Section B row 5 and the
+     pointer amendment: the original text was reachable in seconds and nothing forced it onto the
+     page at the point of checking.
+     **(b) The distance was one clause, not one word.** The package describes the paraphrase as
+     *"One word apart"*. That figure originated in S26's own closing summary, compressing *"one
+     clause"* for a hand-off line, and the package inherited it. Quoting both sentences side by
+     side, which is what the new rule requires, makes the widening visible. Corrected in the
+     amendment.
+     **(c) Applied to the document, as the pair the ruling requires.** At `methodology.tex:375`
+     the adoption principle now reads *"make rejecting the null expensive: a foundation model is
+     served only where it defeats a benchmark that costs nothing to compute on the rolling-origin
+     protocol (Appendix~\ref{app:static-regime})"*, and new appendix section **B.13** carries the
+     `ValueError`, the two static figures and the regime the gate reads. Funded by the RQ4
+     de-duplication at `conclusion.tex:155`, re-measured **12 words** in situ. Both passages were
+     quoted side by side before the cut and the removed material has three surviving homes, two of
+     which state it more strongly than the Conclusion did. Net **8 words**, exactly the forecast.
+     **(d) The pointer cost a word and it was recovered in the same sentence.** `\ref{}` counts
+     zero and the literal *"Appendix"* counts one, so the phrase plus pointer is +5 against the
+     ruling's +4 ceiling. *"make the null expensive to reject"* became *"make rejecting the null
+     expensive"*, same proposition, one word shorter. The instruction not to upgrade to the
+     minimal form was followed.
+     **(e) The static failure is a split artefact, not a broken model.** Chronos-2 refuses a future
+     frame that is not a gap-free continuation of its context, and the static split holds a
+     four-week validation slice in exactly that gap (`config.py:247-248`, `log/16` G12.2, confirmed
+     non-regressive at `log/17` item 6 and `log/19` item 5). B.13 says so. This makes the
+     scope-phrase-plus-deferral pairing safer than the +31 form would have been, since *"raises an
+     error and returns no forecast"* reads as a model defect. The static ordering is also
+     venue-specific: the cheap baseline wins the block at the Beer Hall only, foundation arms lead
+     it at Two River Taps, and nothing separates at Ellel.
+     **(f) Recorded, not repaired.** The Prophet note's +281 against a predicted +148 is a
+     brief-estimate failure, not scope creep; the content list required five facts plus the
+     row-shift test against a draft naming neither the entrant nor any commit. And the appendix has
+     grown 9,597 to **10,570**, +973, of which **329 is this package's own Part 1**. The exclusion
+     is ruled and CLOSED at `knowledge/00_marking_criteria.md:402`, but on a supervisor ruling, the
+     issued source being silent on what the 20,000 counts. Flagged, no action.
+     **(g) Verification.** `latexcheck` PASS, zero errors, zero undefined references, zero
+     undefined citations, zero floats lost; B.13 resolves and the appendix letters A, B, C, D are
+     unmoved. `formatcheck --body-from 21` PASS over 96 of 116 pages and 2658 justified lines, with
+     inner white improving 8029pt to 7583pt. Against a same-session rebuild of `6643753` the box
+     populations are **identical**, 4 overfull and 14 underfull, the sole textual difference being
+     one anchor moving 494 to 495 because `methodology.tex` gained a line. A word-by-word diff of
+     the whole rendered PDF, 43,442 words against 43,785, accounts for every change and finds no
+     word broken, joined, dropped or reordered anywhere else; it also confirms the pre-existing
+     body reference to the closure case correctly renumbered B.13 to B.14. Suite **green: 667
+     passed, 1 skipped, 1 deselected, 0 failed, exit 0**, reconciled three ways. The store-ceiling
+     assertion did not run and nothing was installed to make it. Full report at
+     `log/100_rulings_applied.md`.

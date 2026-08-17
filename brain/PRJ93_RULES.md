@@ -921,6 +921,61 @@ only what was done.* Every log in this project records completed work, so an omi
 no trace anywhere — not in the log, not in the compile, not in the word count. Quoting is the
 cheapest available way to make an omission legible, because the quote is either there or it is not.
 
+#### AMENDMENT 2026-08-17 (S27): the four cases above do not cover certifying a draft against a requirement
+
+**The rule above lists what must be quoted, the list is not closed, and a session can satisfy every
+bullet on it while still certifying by paraphrase.** It was written about critique logs: role
+remits, gate wordings, source sentences. None of its four cases is *a report certifying that a
+drafted form satisfies the requirement its package stated*, and that is the case that failed.
+
+`log/98` section 3.2 priced two forms of the Section 7.3 partition finding and closed with:
+
+> **Both carry the Winkler counter evidence**, as the package requires, and both name the
+> oracle as an oracle.
+
+The requirement those forms had to meet, stated in the S26 package, was:
+
+> [the finding must] carry the Winkler counter evidence and must label the oracle as unavailable
+> at forecast time. ... A form omitting either is not to be applied.
+
+Neither form had the second half. The text S24 applied on the strength of that sign-off read
+*"exactly what an oracle grouped on realised occurrence achieves"*, which names the oracle and says
+nothing about whether grouping on realised occurrence is reachable at the moment the band is
+issued. Those two sentences are not one word apart. They are a clause apart, and the clause is the
+entire requirement: a reader who knows the term infers the unavailability, and a reader who does
+not reads the oracle as a method that beat the served one. The form stood on `origin/main` through
+S25 and into S26 carrying a certification that was true, internally consistent, and about the wrong
+property. `log/99` section 1.1 records the repair.
+
+**This is Section B row 5's failure mode and the pointer rule's, in a third place.** Nobody was
+careless in any of the three. The original text existed, was reachable in seconds, and was simply
+not re-read at the moment of checking, because nothing in the artefact being produced required it
+to be on the page. The variable that predicts the miss is not care. It is whether the requirement's
+own words are forced into the record where the check is written down.
+
+**The obligation therefore moves onto the certifying session, and becomes mechanical:**
+
+> **A certification quotes the requirement it discharges, verbatim, beside what was checked. A
+> certification that paraphrases the requirement has not discharged it.**
+
+It carries the three properties the pointer amendment carries. It is **discharged by the party
+holding the requirement**, at the moment they have it open, rather than by a later session
+reconstructing what the requirement must have been. It is **checkable without judgement**: a
+sign-off carrying no quoted requirement is defective on its face, whatever it concludes, which
+makes it a mechanical sweep rather than a reading. And it **costs the certifier one copy and
+paste**, which is the only price at which a discipline survives contact with a deadline.
+
+One thing it does not close, stated so it is not mistaken for covered. A quoted requirement beside
+a quoted draft still leaves the reading to be done, and a reading can be wrong. What quoting buys
+is not correctness; it is that a wrong reading becomes legible to the next person, which a
+paraphrase never is.
+
+**A note on the "one word" figure, because it illustrates the same mechanism one level up.** The
+package commissioning this amendment described the paraphrase as *"One word apart"*. That phrasing
+originated in S26's own closing summary, which compressed *"one clause"* to *"one word"* for a
+single hand-off line; the package then inherited it as fact. Compression widened the claim,
+nothing downstream could see it, and the corrected distance is recorded here beside both quotes.
+
 ## Overleaf pre-flight
 
 Every file bound for Overleaf gets an AI-writing pass before it goes:
