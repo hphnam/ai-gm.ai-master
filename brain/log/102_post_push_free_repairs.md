@@ -9,8 +9,8 @@
 
 | | at start | at end |
 |---|---|---|
-| `ai-gm.ai-master` HEAD | `609badaf` | `609badaf` (edits uncommitted; see §7) |
-| `prj93-overleaf` HEAD | `c34c266` | `c34c266` (edits uncommitted, unpushed) |
+| `ai-gm.ai-master` HEAD | `609badaf` | **`50486a55`** (committed, local) |
+| `prj93-overleaf` HEAD | `c34c266` | **`8e4e1a0`** (committed, **UNPUSHED** — one commit ahead of `origin/main`) |
 | **Overleaf remote `main`** | `c34c266d9deace708bc21d7a9bb26aee73b6178a` | unchanged, re-read at close |
 | **Counted body** | **19,989** | **19,985** (**−4**) |
 | Appendix words | 10,570 | 10,631 (**+61**, V3 only) |
@@ -309,12 +309,18 @@ The artefact, not the exit code, is what reported it.
 
 ## 7 · State at close, and what is NOT done
 
-**Uncommitted, in `prj93-overleaf`** (tracked): `chapters/literature_review.tex`,
-`appendix/robustness.tex`, `figures/gap_map.pdf`. **Unpushed and not to be pushed by me.**
+**`prj93-overleaf` `8e4e1a0`** — `chapters/literature_review.tex`, `appendix/robustness.tex`,
+`figures/gap_map.pdf`. **Committed locally and UNPUSHED: `origin/main..HEAD` is 1.** Not to be
+pushed by me; the PreToolUse guard stands and Nam pushes. Working tree carries only a modified
+`.DS_Store`, which is pre-existing and not this session's.
 
-**Uncommitted, in `ai-gm.ai-master`:** `brain/drafts/figures/make_litreview_figures.py` (+ the
-regenerated `gap_map.pdf`/`.png`), `brain/scripts/formatcheck.py`,
+**`ai-gm.ai-master` `50486a55`** — `brain/drafts/figures/make_litreview_figures.py` (+ the
+regenerated `gap_map.pdf`/`.png`), `brain/scripts/formatcheck.py`, `brain/ledger/phase_state.md`,
 `brain/log/Decision_and_Resolution_Log.md`, `brain/log/96_...md`, and this report.
+
+**Pre-flight is done and reported, per the lifecycle rule: a clean `latexcheck` is the precondition
+for the push, and §6 carries what it said.** What has NOT happened is the push itself, so Overleaf
+still renders `c34c266` — the state V1 verified, without any of this session's four repairs.
 
 **Out of scope and untouched, as instructed:** H-2, H-5, H-6a, H-6b, Part 3 F1, H-8, H-4 option B,
 any body→appendix relocation, any instrumented Chronos re-run, any change to a served model, a frozen
