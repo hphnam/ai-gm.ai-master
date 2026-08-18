@@ -5463,3 +5463,21 @@ is explicitly Nam's ruling and is recorded unapplied.
 **Two corrections recorded.** The clean-clone blocker is **Inkscape**, not a missing `svg.sty` —
 `svg.sty` ships with TeX Live 2026 and the local stub *shadows* it. And report 96's `forward.py`
 limb is wrong while its **headline measurement stands and is strengthened**.
+
+### S29 post-push re-verification — 2026-08-18
+
+Both pushes landed and were verified **against the remotes, not against exit codes**.
+`ai-gm` `origin/brain-construction-local` = **`671772f6`** (35 commits, `31691e2d..671772f6`;
+`50486a55` contained; unpushed range empty). Overleaf `origin/main` = **`8e4e1a0`**
+(`c34c266` still contained, so history was extended and not rewritten; unpushed range empty;
+remote not ahead).
+
+The pushed Overleaf state was cloned **directly from the remote URL** and compiled, per the rule
+requiring the strong form after a change touching a float body: **`latexcheck` PASS, 116 pages,
+0 errors, 0 undefined references, 0 undefined citations, 0 floats lost.** All four repairs verified
+present in that render — B.13 heading p86, `sec:ladder` clause p21, `By column:` caption p13, V3's
+qualification p87, old pointer sentence absent. Figure cell confirmed open/dashed/unfilled by
+rasterising p13 and looking, after a `get_drawings()` probe was found to scan an empty set (the
+figure is an embedded XObject).
+
+**Every SHA in the §0 table of `log/102` before this entry is superseded.** Report §8 carries it.

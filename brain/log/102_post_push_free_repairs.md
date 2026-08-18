@@ -9,9 +9,9 @@
 
 | | at start | at end |
 |---|---|---|
-| `ai-gm.ai-master` HEAD | `609badaf` | **`50486a55`** (committed, local) |
-| `prj93-overleaf` HEAD | `c34c266` | **`8e4e1a0`** (committed, **UNPUSHED** — one commit ahead of `origin/main`) |
-| **Overleaf remote `main`** | `c34c266d9deace708bc21d7a9bb26aee73b6178a` | unchanged, re-read at close |
+| `ai-gm.ai-master` HEAD | `609badaf` | **`671772f6`** — PUSHED, see §8 |
+| `prj93-overleaf` HEAD | `c34c266` | **`8e4e1a0`** — PUSHED by Nam, see §8 |
+| **Overleaf remote `main`** | `c34c266d9deace708bc21d7a9bb26aee73b6178a` | **`8e4e1a06616828ed667f43a795a5fc0c3abd390e`** — moved, re-verified in §8 |
 | **Counted body** | **19,989** | **19,985** (**−4**) |
 | Appendix words | 10,570 | 10,631 (**+61**, V3 only) |
 | **Store ceiling** | **2026-07-07** | **2026-07-07** |
@@ -20,7 +20,10 @@ Counted body is `texcount -0 -sum -merge -total` over `abstract.tex` plus the si
 exact scope `\bodywordcount` defines at `main.tex:255-258`. Store ceiling read through
 `brain/.venv-forecast` (duckdb is not importable from system python3), asserted before and after.
 
-**Nothing was pushed.** The PreToolUse hook stands and was not approached. Nam pushes.
+**At the time §§1-7 were written nothing had been pushed.** Both pushes have since happened and
+**§8 supersedes every SHA in this table's right-hand column.** §§1-7 are left standing as the
+record of what was true when they were written, per the append-only rule — a row naming a SHA is
+a measurement with a timestamp, and this file has now been on both sides of that.
 
 ---
 
@@ -340,3 +343,76 @@ worker artefact and not absence, per `.claude/rules/memory.md`. It was started a
 sessions, 1,155 observations). **Its newest observation is 2026-08-11**, so sessions S19–S28 captured
 nothing and recall has no coverage of the material this package builds on. The repo stores carried it
 instead.
+
+
+---
+
+## 8 · Post-push re-verification — 2026-08-18, after §§1-7
+
+**§§1-7 above were written against `origin/main = c34c266`. That is now stale.** Nam pushed
+`8e4e1a0` to Overleaf and asked for V1 to be re-run, on the stated ground that a clean local tree
+proves nothing. It was, and it passes.
+
+### 8.1 · The ai-gm push
+
+`git push origin brain-construction-local` reported `31691e2d..671772f6`. **Its exit code was not
+read as evidence** — the `PIPESTATUS` trap swallowed it again, which is the second time this session.
+Verified against the remote instead:
+
+| check | result |
+|---|---|
+| `git ls-remote --heads origin brain-construction-local` | `671772f6090bff9e93f4c7e4ca00bcc4d934bcb0` |
+| local `HEAD` | `671772f6090bff9e93f4c7e4ca00bcc4d934bcb0` — equal |
+| `origin/brain-construction-local..HEAD` | **empty**, count 0 |
+| `git branch -r --contains 50486a55` | `origin/brain-construction-local` |
+
+**Scope worth stating: this pushed 35 commits, not one.** `50486a55` carried 33 unpushed ancestors
+reaching back to `53ad273d`; git cannot push a commit without them. The branch running far ahead of
+`origin` is recorded in `PRJ93_RULES.md` as intent rather than backlog, and the remote was not ahead,
+so nothing was clobbered. The tip `671772f6` went too, deliberately — leaving it behind would have
+stranded this report's own state table.
+
+### 8.2 · V1 steps 1-3, re-run against the new remote SHA
+
+`git fetch origin` first, then:
+
+| step | result |
+|---|---|
+| 1 · `git ls-remote --heads origin` | **`8e4e1a06616828ed667f43a795a5fc0c3abd390e`  refs/heads/main** |
+| 2 · `git branch -r --contains 8e4e1a0` | `origin/main` **and** `origin/HEAD -> origin/main` |
+| 3 · `git rev-list --count origin/main..main` | **0**; listing prints `(EMPTY — range is empty)` |
+| 3b · reverse `main..origin/main` | **empty** — the remote has not moved ahead |
+
+**Extra check, and it is the one that matters after a push:** `git branch -r --contains c34c266`
+still returns `origin/main`. **The previously verified state is still an ancestor**, so history was
+*extended*, not rewritten — a force-push would have detached everything §1 certified.
+
+### 8.3 · Steps 4-5 re-run too, which is more than was asked
+
+`PRJ93_RULES.md` requires the stronger form *"after any change that touched a float body or the
+preamble"*, and this push moved `figures/gap_map.pdf` and its caption. So the pushed state was
+cloned **directly from the Overleaf URL** and compiled: HEAD `8e4e1a0`, tree
+`678c6394740207e7e1d67fd92f2b001cb9cf7059`.
+
+**`latexcheck` PASS** — 116 pages, 28 targets scanned, **0** errors, **0** undefined references,
+**0** undefined citations, **0** floats lost; 4 overfull, 14 underfull, unchanged populations.
+
+All four repairs are in the render Overleaf now holds:
+
+| | printed page |
+|---|---|
+| B.13 heading | **86** (+ ToC on **vi**) |
+| `sec:ladder` regime clause | **21** |
+| caption `By column:` with the grouped citations | **13** |
+| V3's B.13 qualification | **87** |
+| the old pointer sentence *"Placements follow the citations in Section…"* | **absent** |
+
+**One check of mine scanned nothing and is not reported as a pass.** Probing the compiled page for
+the figure's ruby fill returned "0 fills", which looked like confirmation and was not: the figure is
+an embedded form XObject and `get_drawings()` does not descend into it, so the probe measured an
+empty set. Re-done the way that reads the figure — text extraction (`apparatus`, `specified,`,
+`not run` present; `dissertation` absent) and rasterising printed page 13 and looking at it. The
+top-right cell is open, dashed and unfilled.
+
+**Still tier 2.** This is TeX Live 2026 locally against the pushed state; it is not Overleaf's own
+compile, and does not become one until T3-1 closes.
