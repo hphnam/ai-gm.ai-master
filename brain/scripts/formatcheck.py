@@ -245,10 +245,34 @@ def float_distance(aux_path, doc, body_from):
 
 # ------------------------------------------------------------------ report
 
+def first_arabic_page(doc):
+    """PDF index (1-based) of the first arabic-numbered page, from the PDF's own
+    /PageLabels tree, which hyperref writes from \\pagenumbering.
+
+    Derived rather than passed, because the hardcoded 21 in the canonical invocation
+    was five pages past the truth: the front matter is 15 roman pages, so the gate
+    began at printed page 6 and never scanned Chapter 1 or the opening of Chapter 2.
+    A replacement constant would drift the same way the moment the front matter does.
+    Returns None when the document carries no arabic run to find."""
+    for rule in doc.get_page_labels():
+        if rule.get("style") in ("D", "d"):
+            return rule["startpage"] + 1
+    return None
+
+
 def run(pdf, aux, body_from, tol, accept):
     doc = pymupdf.open(pdf)
     if doc.page_count == 0:
         sys.exit("FAIL - refusing to report on a PDF with zero pages")
+
+    if body_from is None:
+        body_from = first_arabic_page(doc)
+        if body_from is None:
+            sys.exit("FAIL - no arabic page run in /PageLabels; pass --body-from "
+                     "explicitly rather than letting the gate guess its own scope")
+        origin = f"derived from /PageLabels, front matter {body_from - 1} pages"
+    else:
+        origin = "passed on the command line"
 
     block, measured = derive_block(doc, body_from)
     if measured < MIN_LINES or not block:
@@ -256,7 +280,8 @@ def run(pdf, aux, body_from, tol, accept):
                  "a scan this small cannot report a clean document")
 
     print(f"scanned {doc.page_count - body_from + 1} pages of {doc.page_count} "
-          f"(body from p.{body_from}), {measured} justified lines")
+          f"(body from p.{body_from}, printed p.{doc[body_from - 1].get_label() or '?'}; "
+          f"{origin}), {measured} justified lines")
     for parity in sorted(block):
         left, right = block[parity]
         side = "odd " if parity else "even"
@@ -398,8 +423,9 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("pdf", nargs="?")
     ap.add_argument("--aux", help="main.aux, for section 3")
-    ap.add_argument("--body-from", type=int, default=1,
-                    help="first arabic-numbered page, to skip the front matter")
+    ap.add_argument("--body-from", type=int, default=None,
+                    help="first arabic-numbered PDF page, to skip the front matter; "
+                         "derived from the PDF's /PageLabels when omitted")
     ap.add_argument("--tolerance", type=float, default=SPILL_TOL)
     ap.add_argument("--accept", help="file of RULED spills; see brain/ledger/format_accepted.txt")
     ap.add_argument("--self-test", action="store_true")

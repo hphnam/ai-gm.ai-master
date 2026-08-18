@@ -5429,3 +5429,37 @@ four arms' by availability, making the row incomparable; and the per-group width
 differenced by hand from rounded display values, which put Ellel's at −9.54 against the
 instrumented −9.55. The delta is now an artefact field (`b_to_d_group_deltas`) for the same reason
 C7 added `cell_deltas` to its own instrument.
+
+## S29 — post-push verification and the free repairs — 2026-08-18
+
+**Completed.** V1 passed: Overleaf remote `main` is `c34c266d9deace708bc21d7a9bb26aee73b6178a`,
+`c34c266` is contained in `origin/main`, `origin/main..main` is empty and the remote is not ahead.
+A clone taken **directly from the Overleaf URL** compiled that state: 116 pages. Both required
+strings render — the B.13 heading on printed **86**, the `sec:ladder` regime clause on printed **21**.
+
+**Applied.** V2 (figure + caption, **−4** counted body), V3 (B.13 API-path qualification,
+appendix-only **+61**), V4 (decision row 122, six parts, no document edit), V5 (`formatcheck
+--body-from` now derived from `/PageLabels`).
+
+**Verified end state.** Counted body **19,989 → 19,985** (cap 20,000, margin +15). Appendix
+**10,570 → 10,631**. Store ceiling **2026-07-07** before and after. `latexcheck` PASS — 0 errors,
+0 undefined references, 0 undefined citations, 0 floats lost. `formatcheck` PASS at the widened
+scope (101 of 116 pages, from printed page 1) with **no new spill**; max overshoot in the
+newly-reachable band **+0.12 pt**. `figurecheck` PASS over 27 sources. `formatcheck --self-test`
+PASS both directions.
+
+**Artefacts.** `brain/log/102_post_push_free_repairs.md` (report), decision row **122**, S19
+forward-pointer appended at the deferral site inside `brain/log/96_...md`.
+
+**Unstarted / not done.** Nothing was pushed — the guard stands and Nam pushes. Out of scope and
+untouched: H-2, H-5, H-6a, H-6b, Part 3 F1, H-8, H-4 option B, any body→appendix relocation, any
+instrumented Chronos re-run, any change to a served model, a frozen artefact or the store.
+
+**Two items need Nam.** (1) The caption placement conflict: the package's "−4 or better" and
+"each key placed on the system it belongs to" are not jointly satisfiable — per-system placement
+measures **+9**. Applied at −4 with column-level placement. (2) Row 122(b), the R-8 convergence,
+is explicitly Nam's ruling and is recorded unapplied.
+
+**Two corrections recorded.** The clean-clone blocker is **Inkscape**, not a missing `svg.sty` —
+`svg.sty` ships with TeX Live 2026 and the local stub *shadows* it. And report 96's `forward.py`
+limb is wrong while its **headline measurement stands and is strengthened**.

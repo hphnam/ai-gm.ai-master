@@ -103,6 +103,17 @@ counter-example. The compute engine's forward path bands the same way,
 `GET /forecast` (`service/app.py:194-225`) reads `warehouse.read_band`, which applies no
 model filter, so it returns whatever is persisted for the venue.
 
+> **CORRECTED 2026-08-18 (S29), decision row 122(a).** The sentence above — *"The compute engine's
+> forward path bands the same way, `compute/forward.py:203`"* — is wrong about `forward.py`, and the
+> quoted line 203 is the line before the difference. `compute/forward.py:204-218` carries a **per-group
+> floor** that `conformal/wrap.py` does not: it drops any Mondrian group holding fewer than
+> `MIN_CALIB_RESIDUALS = 30` residuals and falls back to the marginal band, its own comment reading
+> *"The floor has to apply PER GROUP, not to the pool."* `conformal/wrap.py:216` only **counts** the
+> lapse (`undersized[lvl] += int((ag == g).sum() < conformal_min_n(lvl))`) and issues the band anyway.
+> **This report's headline measurement STANDS and is strengthened, not weakened:** the partition is
+> active in the store precisely because `conformal/wrap.py` has no floor. See row 122(a) for R-4.3,
+> the consequence on the compute path.
+
 ### 1.3 · The store, which is the only evidence that settles it
 
 Code that could partition is not a partition that did. Read-only against

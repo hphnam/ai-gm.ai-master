@@ -111,13 +111,16 @@ def gap_map() -> None:
                 linewidth=0.6, edgecolor=FAINT,
                 facecolor="none", zorder=1))
 
-    # The empty cell is the argument, so it is the only one drawn in ink.
+    # The cell is drawn open, not filled, because the chapter's claim is that it is VACANT:
+    # the caption and sec:rw-synthesis both say the apparatus is specified and not run, and a
+    # tinted cell carrying this work's name read as the gap being occupied.
     tx, ty = TARGET
     ax.add_patch(FancyBboxPatch(
         (tx - 0.44, ty - 0.40), 0.88, 0.80,
         boxstyle="round,pad=0,rounding_size=0.04",
-        linewidth=1.1, edgecolor=MARK, facecolor=MARK, alpha=0.10, zorder=2))
-    ax.text(tx, ty, "this\ndissertation", ha="center", va="center",
+        linewidth=1.1, edgecolor=MARK, facecolor="none",
+        linestyle=(0, (4, 2.5)), zorder=2))
+    ax.text(tx, ty, "apparatus\nspecified,\nnot run", ha="center", va="center",
             fontsize=FS_LABEL, color=MARK, linespacing=1.5, zorder=4)
 
     for x, y, label, dy in SYSTEMS:

@@ -4015,3 +4015,91 @@ them into the append-only log so it is the continuous WP1-to-present record.
      passed, 1 skipped, 1 deselected, 0 failed, exit 0**, reconciled three ways. The store-ceiling
      assertion did not run and nothing was installed to make it. Full report at
      `log/100_rulings_applied.md`.
+
+122. **S29: six records taken and no document edit made for any of them. Report 96's `forward.py`
+     limb is corrected while its headline stands; the Q1 closure is reopened as an enquiry; two
+     gate blind spots are measured; one orphan label is recorded and deliberately not removed.**
+     *Each part quotes verbatim the finding it records, per rule S27 — a certification quotes the
+     requirement it discharges rather than paraphrasing it.*
+
+     **(a) Report 96, corrected — and its measurement STANDS.** `log/96` asserted, verbatim:
+     *"The compute engine's forward path bands the same way, `compute/forward.py:203`"*, quoting
+     `by_grp = _mondrian_quantiles(abs_res, groups, level)`. That is the line **before** the
+     difference. The per-group floor is at `compute/forward.py:204-218`, whose own comment reads
+     verbatim: *"The floor has to apply PER GROUP, not to the pool. Mondrian splits the residuals
+     after the pooled check, so a venue closed one day a week can clear 30 pooled and leave 4 in the
+     closed group - and `conformal_quantile` clamps k to n rather than failing, so that group's
+     '90% quantile' is silently the max of 4 errors."* It drops any group under
+     `MIN_CALIB_RESIDUALS = 30` (`compute/forward.py:42`) and falls back to the marginal band.
+     `conformal/wrap.py` has **no such floor**: line 216 only counts the lapse
+     (`undersized[lvl] += int((ag == g).sum() < conformal_min_n(lvl))`) and line 217 then issues the
+     group band regardless (`qpt = np.array([qg.get(g, q) for g in gb])`).
+     **Report 96's headline measurement therefore STANDS, and the correction strengthens it:** the
+     partition is active in the store *because* `conformal/wrap.py` has no floor. The forward pointer
+     is appended at the deferral site in `log/96` itself, per rule S19, in this session.
+     **R-4.3, recorded.** `BAND_CALIB_DAYS = 90` (`config.py:263`) and `forward.py:111` walks
+     `first_target = last - Timedelta(days=BAND_CALIB_DAYS)`, an inclusive **91-day** span — exactly
+     13 weeks, so a venue closed Mondays and Tuesdays contributes **26** closed-group rows against a
+     floor of 30. The closed group is therefore dropped on **every run at every venue**, and those
+     days take the marginal band. **This is immaterial to every reported number in the dissertation**,
+     which is banded on the `conformal/wrap.py` path, not the compute path. Verified at the code, not
+     from a report's prose.
+
+     **(b) The R-8 convergence — ledger and handoff only, NOT the dissertation.** `log/101` records it
+     verbatim: *"Ryan replaced the fixed indicator with `is_peak_trading_day`, learned from the venue's
+     own takings, leak-free through the calibration walk"*, and *"Two codebases arrived at the same
+     variable from opposite directions: ours from a conformal coverage failure, his from a
+     feature-engineering improvement to the point forecast."* C7 identified **occurrence** as the
+     variable the closure calendar fails to track. The tension is real and is quoted from
+     `appendix/pseudocode.tex:247-249`: *"That oracle is a ceiling and not a candidate method: whether
+     the venue traded is not known when the band is issued, so grouping on it is unavailable at
+     forecast time."* A peak-trading-day feature learned from history **is** available at forecast
+     time, so it is a candidate method rather than a ceiling. **It is not measured here, so it goes in
+     the ledger and the handoff and not the dissertation.** Nam's ruling.
+
+     **(c) R-9.1 and R-9.2 — present here, and a DIFFERENT defect. B.13 needs no change.** Ryan's
+     date-only frame is present verbatim at `conformal/wrap.py:253-257`:
+     `future = pd.DataFrame({"date": pd.date_range(last + pd.Timedelta(days=1), periods=STANDBY_DAYS,
+     freq="D")})`. **Correction to the S29 package's own characterisation:** it describes the
+     difference as *"KeyError from missing columns, not ValueError from a timestamp gap"*. The
+     exception type is not the discriminator — `_require_covariates` raises `MissingCovariateError`,
+     which subclasses **`ValueError`** (`models/foundation.py:279-290`). The discriminator is the
+     **cause**: absent covariate columns here, against a gap in the timestamp continuation in B.13.
+     The substantive conclusion is unchanged and confirmed: **S27's static-regime attribution is
+     correct and B.13 needs no change on that point.**
+
+     **(d) The Q1 closure is REOPENED as an enquiry, not as a derivation.**
+     `knowledge/00_marking_criteria.md:65-84` marks it, verbatim: *"The scope of the 20,000, and the
+     working target — RULED 2026-08-09 by Phuong. CONFIRMED 2026-08-12 AGAINST THE ISSUED SOURCE.
+     CLOSED — DO NOT ASK AGAIN"*, on the ground, also verbatim: *"the source is silent on what the
+     20,000 counts. There is no sentence about the bibliography, the appendices, the abstract,
+     captions or footnotes anywhere in the document. So the scope is not derivable and never will
+     be: it is Phuong's ruling, it is the only answer this project has or can have, and a later
+     session that re-opens it is re-opening a question with no source-side answer."*
+     **What that closure closed was the DERIVATION FROM THE ISSUED DOCUMENTATION. It did not, and
+     could not, close the enquiry to the supervisor**, who is a source the issued document is not.
+     S28 finding 7.5 establishes that the appendix exclusion is **Phuong's own ruling and not a
+     supervisor ruling** as previously relayed. **10,570 appendix words rest on it** (10,631 after
+     this session's V3). The enquiry is live; the derivation stays closed.
+
+     **(e) Two gate blind spots, both measured today.** `formatcheck --body-from 21`, the canonical
+     invocation, begins at **printed page 6** — the front matter is 15 roman pages, so PDF page 21 is
+     printed page 6 and the gate never scanned Chapter 1 or the opening of Chapter 2. Measured
+     consequence in that band today: a maximum right-margin overshoot of **+0.12 pt** on printed
+     page 1, against a 2.0 pt tolerance, so nothing was being hidden. `latexcheck` reports a
+     **2.81 pt** overfull box at `notation.tex:109-110`. **That site is on printed pages xii-xv, in
+     the ROMAN front matter, which no `--body-from` value can reach**, because the option marks where
+     the arabic body starts and the gate scans forward from it. V5 narrows the blind band from PDF
+     pages 1-20 to PDF pages 1-15; it does not close it. **Measured directly, the residual band is
+     clean**: maximum ink outside the text block across all 15 roman pages is **+0.01 pt**, so the
+     2.81 pt overfull box puts essentially no ink in the margin — a warning with no defect, the case
+     the rules already name for centred material. Two longtables moved into this band on 10 August.
+
+     **(f) The orphan label, recorded and deliberately NOT removed.** `\label{app:derivations}` is
+     defined at `appendix/pseudocode.tex:203` and prints **A.9**
+     (`\newlabel{app:derivations}{{A.9}{75}{Method derivations and apparatus}{section.1.A.9}{}}`,
+     `main.aux:925`). **Scope of the negative:** `grep -rn "ref{app:derivations}" --include='*.tex'`
+     over the whole Overleaf clone returns nothing, so it is referenced by no `\ref` in any `.tex`
+     file there. Harmless today: it sits on a numbered `\section`, not a starred heading, so it
+     prints its own true number and strands nothing. **Not removed in this package**, because a
+     removal can strand the label it left behind and the margin does not permit a surprise.
