@@ -51,3 +51,8 @@ CLAUDE.local.md
 # every future diff. The durable record lives in brain/ledger/ and brain/log/.
 data/state_store.db/
 data/stream_store/
+
+# Third-party exemplar dissertation, kept local. This remote is PUBLIC (verified
+# 2026-08-18), and the file is someone else's work; the other brain/docs entries
+# are issued guidance about the course, which is a different thing to redistribute.
+brain/docs/Sample Dissertation.*
