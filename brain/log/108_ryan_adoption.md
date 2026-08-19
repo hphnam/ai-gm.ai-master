@@ -418,8 +418,10 @@ Three things this package established that were not in the brief:
    his own code already declares, not a merge.
 2. **Our contract rejects his API's current payload**, on exactly two extra fields, both
    belonging to the refit ration. Documented, not coded around.
-3. **`evaluate_static("ellel")` cannot complete on this tree**, and has not been able to
-   for some time — `config.VENUE_SCALE_BASIS["ellel"] == "unscaled"` reaches
+3. **`evaluate_static("ellel")` cannot complete on this tree**, and the test that would
+   have said so has been deselected by node id since S27 on the belief that it was a network
+   test. It is not: the failure reproduces in `.venv-run`, which cannot reach Hugging Face at
+   all. It has not been able to complete for some time — `config.VENUE_SCALE_BASIS["ellel"] == "unscaled"` reaches
    `harness._scale_pairs` before the two places `models/ladder.py` handles it. No figure in
    the dissertation rests on it; the Ellel static table in the committed artefact is not
    currently reproducible. Recorded, not repaired.

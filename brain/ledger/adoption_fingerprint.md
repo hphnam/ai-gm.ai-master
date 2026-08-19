@@ -112,6 +112,17 @@ is what this fingerprint compares**; a count can stay at 12 while a path changes
    **Whoever runs this fingerprint next must expect one failure, and must check it is
    still this one.** A green suite here would itself be a change.
 
+   **And the earlier belief about this test was wrong.** Past runs (S27, S32) deselected it
+   by node id on the record that it *"falls back to downloading Chronos weights from Hugging
+   Face unauthenticated"*, which is why the counts those packages quote do not reproduce
+   here. The failure measured above is **not** a network failure: it was taken in
+   `.venv-run`, which has no `torch` and no `chronos`, so no download is reachable, and the
+   exception is raised in `harness._scale_pairs` after prediction. **The deselection was
+   masking a real defect, not skipping a flaky one.** The same test also failed at the same
+   position in the `.venv-forecast` attempt, but that run was killed for loading model
+   weights before its traceback was written, so the mechanism *there* is not established
+   here.
+
 ---
 
 ## 3 · What each value is invariant to
