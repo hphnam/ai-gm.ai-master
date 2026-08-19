@@ -1237,3 +1237,65 @@ points at would falsify the trace, and this addendum is the trace.
 temperature + prompt VERSION are pinned and stamped into every"*, which carries the same stale
 half. It is a code comment rather than a document claim, and editing the brain codebase was out of
 scope for S35.
+
+---
+
+## ADDENDUM 2026-08-19 (S37 V9.1) — three corrections from S36, appended, no numbered row edited
+
+Each row below corrects a figure or a belief that a previous package carried. The numbered
+rows above are left exactly as written; these are the forward pointers.
+
+### C-S37-1 · The service surface is **12 endpoints, not 8**
+
+Measured by counting `@app.{get,post,put,patch,delete}("…")` across `brain/service/*.py`:
+**ten in `service/app.py`, two in `service/compute.py`.** The S36 package specification
+expected 8; that figure matches nothing in the tree and no artefact here ever produced it.
+
+**Cause of the drift, and it runs the other way from a stale count.** `brain/README.md`
+listed **eleven** routes for `service/app.py`, one more than exist, because it still carried
+`POST /refresh`. That route was deleted under M1 and `service/app.py:510` says so verbatim:
+*"The POST /refresh route is gone (M1): it was unauthenticated, unbounded"*. **Fixed in this
+package**, along with a second note lower in the same file that described `/refresh` as the
+reason to bind to localhost — the live-top-up write behind `GET /forecast?freshness=live` is
+what makes that advice true now.
+
+The invariant worth carrying forward is not the count. **It is the route list**: twelve can
+stay twelve while a path or a verb changes underneath it.
+
+### C-S37-2 · The suite is **678 collected with one failure**, not 676 with none
+
+Measured in `.venv-run`: **1 failed, 669 passed, 8 skipped**. Two parts:
+
+- 678 rather than 676 because S32 added `tests/test_agent_cache_checkpoint.py`.
+- The failure is
+  `tests/test_a4_ladder.py::test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted`,
+  and **it fails at the baseline**, before any package touched anything.
+
+**The belief that it was a network test is wrong.** S27 and S32 deselected it by node id on
+the record that it *"falls back to downloading Chronos weights from Hugging Face
+unauthenticated"*. It fails in `.venv-run`, which has neither `torch` nor `chronos`, so no
+download is reachable. The exception is
+`eval.harness.UnknownBasisError: unknown scale basis 'unscaled'`, raised in
+`harness._scale_pairs` **after** prediction: `config.VENUE_SCALE_BASIS["ellel"] == "unscaled"`
+reaches `harness.point_metrics` at `models/ladder.py:405` before the two places the same file
+handles that basis (`_score` `:440`, `loss_names` `:449`).
+
+**A deselection is a claim, and this one masked a defect for two packages.** Consequence:
+`evaluate_static("ellel")` cannot complete, so the Ellel static-regime table in
+`models/ladder_results_L1_ellel.md` is not regenerable from this code — and it prints a MASE
+column for the one venue `methodology.tex:259` rules has no defensible scaled basis. See
+§V9.2 of `brain/log/109_remote_purge.md` for which document claims that touches.
+
+### C-S37-3 · A pre-push secret scan of the **diff** cannot see what is already tracked
+
+S35's pre-push scan reported clean and was correct about what it examined: the diff being
+pushed carried no `olp_`, no `sk-`, no DSN, and no `.xlsx` or `.csv`. It reported clean
+**indefinitely**, because the twenty-one venue-data files were added in `58e9b792` on
+2026-06-25 and appear in no later diff.
+
+**The scan's scope was never stated alongside its verdict, which is what made it read as a
+guarantee.** Any future pre-push check must say what it scanned. A diff scan answers *"does
+this push add a secret"*; it does not answer *"does this repository contain one"*, and only
+the second question protects a public remote. The second is
+`git rev-list --objects --all` over full history, which is what found the exposure S37
+removed.

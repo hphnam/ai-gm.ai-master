@@ -191,7 +191,12 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | GET | `/stock/cover?venue=` | A12 (Beer Hall; empty envelope for other venues) |
 | GET | `/briefing?venue=&as_of=&layer=&freshness=` | capstone: ranked, de-duplicated, attributed daily feed |
 | GET | `/freshness?venue=` | per-venue currency (source, staleness, last re-fit) |
-| POST | `/refresh?venue=&force=&refit=` | operator/cron T2 refresh (+ conditional T3) — off the model surface |
+
+> **There is no `POST /refresh` route.** It was removed under M1 — unauthenticated,
+> unbounded and able to force a T3 re-fit; `service/app.py` says so at the foot of the
+> file. A full refresh runs only via `python -m ingest.refresh`. The table above listed
+> it until 2026-08-19; the surface is **twelve** endpoints, ten here and two in
+> `service/compute.py`.
 
 Every serving envelope also carries a `freshness` block (`source`, `is_live`,
 `stale`, `staleness_days`), so no answer is returned without stating its currency.
@@ -202,9 +207,11 @@ The main API calls this service over HTTP from
 BRAIN_BASE_URL=http://127.0.0.1:8088
 ```
 
-> Bind the service to localhost only. `/refresh` mutates the store and triggers
-> compute; it has no auth and relies on the localhost bind as its trust boundary.
-> Do not set `BRAIN_HOST=0.0.0.0` without adding auth in front.
+> Bind the service to localhost only. `GET /forecast?freshness=live` reaches a bounded
+> write on the store (`service/app.py:17`), and none of these ten routes carries auth —
+> the localhost bind IS the trust boundary. Do not set `BRAIN_HOST=0.0.0.0` without
+> putting auth in front. The route that made this note urgent, `POST /refresh`, is gone
+> (M1); the throttled live top-up is what remains.
 
 ## Live ingest / freshness (three-tier model)
 

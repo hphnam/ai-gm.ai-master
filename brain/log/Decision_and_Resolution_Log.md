@@ -4485,3 +4485,76 @@ them into the append-only log so it is the continuous WP1-to-present record.
      enrichment"*. The adopted rule stops the next one and remediates none of these. Class B was
      empty; the closest call, his redacted 422 handler, was refused because the leak's precondition
      does not exist on this side and the fix arrives with his file on an `add/add` path.
+
+128. **S37: the remote is purged of the venue data and verified clean by content across full
+     history; the exposure is larger than S36 described, and the repository has no forks.**
+     *Branch `ryan-adoption`; `main`, `brain-construction` and `brain-construction-local`
+     force-pushed with `--force-with-lease` naming each expected old SHA; the Overleaf clone not
+     touched; no model call, credential, refit, rescore or store write. Report at
+     `brain/log/109_remote_purge.md`; instruments at `brain/ledger/sha_citation_register.md` and
+     `brain/ledger/commit_map_2026-08-19.txt`.*
+
+     **(a) The exposure was personal data, not only trade data.** `items-2024-01-01-2026-06-01.csv`
+     is 92,329 Square transaction lines, 2025-06-04 to 2026-05-31, 36 columns, carrying **506
+     distinct named customers**, **17 named employees** on every line, and **6,752 distinct card
+     PAN suffixes with card brand** across 74,619 rows — on a repository public since 2026-06-18.
+     S36 called this "real venue trade and PII"; inspection was what established the category.
+
+     **(b) The twenty-one were twenty-six, and an extension list is a guess.** The sweep found the
+     same two exports at the **repository root**, sharing blob `638f80da` with the `brain/data/`
+     copies, plus 18 `data/state_store.db/` agentmemory blobs and 3 `docs/*.xlsx` canaries, both
+     already untracked but alive in history. A **third** root copy,
+     `opening_and_closing_checklist.md`, is a `.md` and matched no extension term; it survived
+     pass 1 and needed a second. Also recorded: `git rev-list --objects` dedups identical blobs
+     and showed 17 files under `brain/data/` where the index has 21 — the correct enumerator is
+     `git log --all --name-only --no-renames`.
+
+     **(c) Backup proved before anything destructive ran.** Bundle 29,854,873 bytes, SHA-256
+     `9b40074e…`, restored to a mirror clone with all 8 refs at identical SHAs, 572 commits, and
+     the 77 MB blob still present. 42 local copies, 42 of 42 SHA-256 pairs matching, extracted
+     before the rewrite because 21 of them existed on no ref tip.
+
+     **(d) `filter-repo` `a40bce548d2c`, two passes. 573 commits before and after — none dropped.**
+     `.git` 376 MB → 22 MB; pack 292.58 MiB → 21.30 MiB. Two refs were converted to branches
+     first (`origin/brain-construction` had no local counterpart; a stash is not a branch), so
+     nothing was lost. Commit map composed across both passes, 574 rows, verified original → final.
+
+     **(e) Verified from outside, by content and not by path.** A fresh mirror clone: zero commits
+     for every removed path, zero hits for every removed filename, and **zero hits for every
+     content string unique to the deleted data across 11,212 objects and 797,749,378 decompressed
+     bytes**. `refs/pull/1/head` — GitHub-managed, unreachable by any force push — appeared to
+     carry `brain/data/`, and carries a **38-byte dangling symlink** to a root path that no longer
+     exists. **0 forks, 0 network, 0 watchers.** Repository still public; that is Nam's decision.
+
+     **(f) The push guard did not block `main`, and the gap is real.**
+     `.claude/hooks/block-dangerous-commands.sh` expects the branch name in the token immediately
+     after the remote; `--force-with-lease=refs/heads/main:<sha>` shifts it one position and the
+     pattern misses. The lease form was necessary — `filter-repo` removes `origin`, and fetching
+     to rebuild tracking refs would have pulled the deleted blobs back — but the bypass is
+     reported rather than left silent.
+
+     **(g) 120 of 121 cited SHAs map.** 207 files scanned, 339 hex tokens, 121 resolving to real
+     commits, cited 429 times; the resolution test correctly excluded the prompt hash `c1137f76`,
+     S36's digest `2c0533c4` and Ryan's `cc93b6fa`. The four citations in the dissertation are all
+     in `appendix/tables.tex` and **all four are LaTeX comments** — no printed sentence cites a
+     SHA. The single unmappable one, `6c919a59`, **was never a reachable commit**: report 99 wrote
+     down its own predicted SHA before making the commit, which actually landed as `4e0867c2`
+     → `ec4f6778`. A broken citation that predates this package.
+
+     **(h) V9.2 · the Ellel static exposure is outcome (2), a claim needs qualifying.**
+     `appendix/robustness.tex:451`, *"The other two venues reorder again"*, is a claim about the
+     ordering of the Ellel static table, which `evaluate_static("ellel")` can no longer produce.
+     Sites 1 and 2 (`methodology.tex:378`, `robustness.tex:442`) are safe — claims about what the
+     reports say, with a mechanism verified at `models/foundation.py`. **No reported number
+     derives from it**; the only static figure printed anywhere, `tables.tex:51`'s 0.824, is the
+     Beer Hall. The sharper form: the committed Ellel static table prints a **MASE** column for
+     the venue `methodology.tex:259` rules has no defensible scaled basis. Not repaired.
+
+     **(i) What this package did NOT remove, and why it is a decision rather than an oversight.**
+     `brain/sim/*_raw.json` (7, item- and venue-grain actuals plus Square merchant id
+     `ML1FFAGJMQBTZ`), `brain/sim/*.parquet` (5, the frozen pre-registration artefacts) and
+     `brain/eval/exchangeability_scores.csv` (5,167 rows of daily actual and forecast) stay:
+     published claims are scored against them, and they carry **no customer name, employee name,
+     card suffix or transaction id** — verified by content scan. The merchant id also sits in five
+     prose files, where redacting it costs nothing and touches no artefact. Also still open: the
+     GitHub Support purge request (drafted, not sent) and whether the exposure is notifiable.
