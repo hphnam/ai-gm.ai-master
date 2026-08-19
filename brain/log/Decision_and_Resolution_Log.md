@@ -4314,3 +4314,93 @@ them into the append-only log so it is the continuous WP1-to-present record.
      116 pages with zero undefined references, citations or lost floats. **No float moved page**:
      `main.tex` was built at `HEAD` in a throwaway worktree and its `main.lof` and `main.lot` are
      byte-identical to the branch build's, page numbers included.
+
+126. **S35: the six rulings are applied and measured, the temperature sentence is separated into
+     the claim that survived and the one that did not, and the exogenous set is measured at
+     fifteen columns of which four do not travel.**
+     *Overleaf clone, branch `feedback-hansi` at `e0add42`, two commits ahead of `main` and
+     unpushed. `git ls-remote origin` returns `019f1354…` for `HEAD` and `refs/heads/main` at both
+     ends; local `main` unmoved. Store ceiling asserted at **2026-07-07** before and after,
+     read-only through `.venv-forecast`; no model load, no refit, no rescore. Ryan's clone
+     re-read at `cc93b6fa`, nothing written. Report at
+     `brain/log/107_rulings_applied_and_exo_drafted.md`.*
+
+     **(a) Counted body 20,085 → 20,206, appendices 10,631 → 10,689.** Six ruled items plus two
+     repairs, each measured before and after on `texcount -0 -sum -merge -total` over the seven
+     files `\bodywordcount` names.
+
+     **(b) P1-min's +1 against a +15 forecast is the ruling's own wording.** S34 priced the
+     day-of-week comparison; the ruling replaced it with the no-forecast outcome, because
+     `_CHRONOS2["api"]` is last-write-wins within a process and so it is not established that both
+     static-block arms were scored by the same call path. Measured on the same base
+     (`0d87d8a:chapters/methodology.tex` = 4,919), the S34 form returns **4,934** and the ruled
+     form **4,935**. The 0.704 / 0.721 pair stays in Appendix B.13. **The no-forecast half carries
+     no such caveat**: B.13's call-path disclosure concerns the univariate arm's static figure,
+     which is the 0.721, not the exogenous arm's `ValueError`.
+
+     **(c) THE TEMPERATURE SENTENCE WAS CARRYING TWO CLAIMS UNDER ONE WORD, AND ONLY ONE
+     SURVIVES.** *Cache-key stability is intact*: the key is
+     `hash(model, prompt_hash, scenario_payload)` and `live_execute`'s docstring records that
+     *"temperature was never a term in it"*, so 644 injections still collapse to 420 distinct calls
+     and the frozen prompt hash is unaffected. **That is all the docstring's "the determinism the
+     pre-registration relies on is unaffected" means.** *Decode determinism is now secured by
+     nothing*, since no sampling parameter is sent. The rewrite states the negative explicitly
+     rather than leaving a reader to infer it from an absence: a repeated call is not guaranteed to
+     return the same response, the cache and not the decode is what makes the numbers reproducible,
+     and a second live run is a new measurement. `numbers_audit.md` row 26 is quoted verbatim and
+     **not edited**; the addendum also records that the row's trace line (`config.py:448`, now
+     `:514`) and its document site (`methodology.tex`, now `appendix/pseudocode.tex`) have both
+     moved. `config.AGENT_TEMPERATURE` stays, because deleting a constant a trace points at would
+     falsify the trace.
+
+     **(d) The four-against-three mapping is CORRECT, and was stated nowhere.** Pooling and weather
+     both serve requirement one, which is exactly RQ3's two limbs; the conformal band is
+     requirement two; the alert cost is three. Repaired at **+19** by discharging the antecedent in
+     its own sentence, so nothing is carried across the `\section` boundary, and by **joining the
+     two qualifications that share a requirement** so four qualification sentences become three.
+     The join cost one word. No content defect, so no stop.
+
+     **(e) The exogenous set is fifteen columns and `chronos2_exo_predict` requires every one**, on
+     both the context and the future frame, raising on a missing column or a NaN. Provenance,
+     answered from the code and the data rather than from judgement: **1** from a country code
+     (`is_bank_holiday`), **4** from a coordinate through a public keyless feed (Open-Meteo
+     weather), **6** from a fixed 2026 fixture calendar crossed with the venue's own POS-derived
+     trading window (`wc_*`), **3** curated by hand for this catchment (Lancashire school terms,
+     Lancaster University terms, local event anchors), and **1 structural to this estate**
+     (`is_ellel_event`, a sibling venue's trading days, which no per-venue source could supply).
+     **Five of fifteen are reconstructible for any venue from open sources; four are not.**
+
+     **(f) The curated event anchor is seven days.** `local_events` holds **7 rows, 2 distinct
+     events**, all `venue_scope = 'lancaster'`, all `source = 'curated'`, 2025-10-09 to 2025-11-08.
+     **There are no Preston rows at all**, so Two River Taps receives a constant-zero
+     `exo_fixture_nearby` despite `local_events.py` documenting a Preston scope. `promo_calendar` is
+     empty. On the Beer Hall's 302-row frame the live-day counts are school term 240, university
+     term 184, weather 302, `is_ellel_event` 62, World Cup 87, bank holiday **5**, event anchor **7**.
+
+     **(g) Ryan's `EXO_ENABLED` is `[]` and his reason converges on ours from his own inputs.**
+     `apps/api/src/modules/proactive-brain/brain-dataset.service.ts:23`, passed at `:133`. His
+     comment at `:15-22` excludes bank holidays from the families because *"they resolve from
+     `country` and are always on"*, which is our class 1 exactly, and names *"a single county's
+     school calendar, two cities' event anchors"*, which is our curated three. **The one difference
+     is weather**: he writes that none of the families can be derived from a POS feed and a venue
+     profile, and his venue profile supplies `lat: null, lon: null`, so his statement is true of his
+     inputs and ours of ours. Searched his `proactive-brain/` and `sales/` modules for `postcode`,
+     `latitude`, `longitude`, `lat,`, `open-meteo`, `openmeteo`, `predicthq` and `PREDICTHQ`: **zero
+     hits** beyond one unrelated spec match. Nothing in the drafted limitation is written from his
+     codebase.
+
+     **(h) Both exogenous sentences are drafted, priced and applied to nothing.** A-short **+38**
+     (38-word sentence), A-full **+53** (a 53-word sentence, above the line S34 cleared this chapter
+     to), B **+38**. Both would land in `sec:disc-limitations`, appended to the paragraph that opens
+     *"Four are properties of the problem"*, **so applying either forces that number to five**.
+     **Neither names a MASE improvement attributable to any feature group**, because no ablation of
+     `CHRONOS2_EXO_COLS` has been run on the Rung-4 arm and the 0.745 against 0.793 gap cannot be
+     apportioned. Such an ablation is possible and is recorded as a further-work note, not run.
+
+     **(i) Exactly two numeric changes in the document, both intended**, found by extracting
+     `\ref`, `\label`, citation keys and numeric literals from `git show 0d87d8a:` and each working
+     file and comparing sorted: `abstract.tex` loses `1.2` and `5.9` (draft 1a), `conclusion.tex`
+     gains `0.489` and `0.926` (P2-full). `latexcheck` PASS at **117 pages**, zero undefined
+     references, citations or lost floats. **No float changed chapter**: all 12 figures and 22
+     tables carry identical numbers and captions, and the nine that moved one page are all in
+     Appendices B and C, downstream of the appendix edit. `venueordercheck` PASS.

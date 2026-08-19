@@ -1179,3 +1179,61 @@ narrowing — the document reports a tighter spread than the data carries. Magni
 are now non-conforming to the new precision rule in `PRJ93_RULES.md` in form — the rule asks each
 row to name the precision it compared at — but not in substance. Bringing them into form is
 bookkeeping, not correction.
+
+---
+
+## ADDENDUM 2026-08-19 (S35 V2) — row 26 has gone STALE, and the sentence it graded is rewritten
+
+**Row 26 is not edited.** It was correct when written and its verdict is preserved. This row
+records what changed under it.
+
+**Row 26, verbatim, at `ledger/numbers_audit.md:187`:**
+
+> `| 26 | "Temperature is zero and the model identifier is pinned" | methodology.tex § Intervention layer | brain/config.py:448; log/46_G17e…:64,224 | AGENT_TEMPERATURE = 0.0; model claude-opus-4-8 pinned | MATCHES | none |`
+
+**Three things drifted, and only one of them is the substantive one.**
+
+1. **The document sentence is no longer true of the call, which is the substantive change.** S32
+   removed the `temperature` argument from `signals/agent.py`'s `live_execute`. The docstring
+   there now records why, verbatim: *"No `temperature` is sent: sampling parameters were removed
+   on Opus 4.7 and later and now 400, so passing `config.AGENT_TEMPERATURE` failed on call one
+   against the pinned `claude-opus-4-8`."* **`config.AGENT_TEMPERATURE = 0.0` still exists and is
+   still 0.0; it is simply not sent.** The pin half of the sentence still holds:
+   `config.AGENT_MODEL = "claude-opus-4-8"` is passed on every call.
+
+2. **The trace line has moved.** Row 26 cites `brain/config.py:448`. `AGENT_TEMPERATURE` is now at
+   `config.py:514`. The constant is unchanged; the file grew.
+
+3. **The document site has moved.** Row 26 cites *"methodology.tex § Intervention layer"*. The
+   sentence lived at `appendix/pseudocode.tex` under `app:agent-apparatus` at the time of this
+   correction, and `grep` over `abstract.tex`, `chapters/` and `appendix/` finds it in that one
+   place only.
+
+**The sentence as rewritten 2026-08-19**, replacing *"Temperature is zero and the model identifier
+is pinned."*:
+
+> The model identifier is pinned and no sampling parameters are sent, because the pinned model
+> rejects them: decoding is therefore not fixed by a temperature setting, and a repeated call is
+> not guaranteed to return the same response. What makes the numbers reproducible is the cache and
+> not the decode.
+
+**THE DETERMINISM CLAIM IS NOT SMUGGLED BACK IN, AND THE DISTINCTION MATTERS.** Two different
+things were being carried by one sentence:
+
+- **Cache-key stability**, which is intact and is what `live_execute`'s docstring means by *"The
+  determinism the pre-registration relies on is unaffected"*. The key is
+  `hash(model, prompt_hash, scenario_payload)` and temperature was never a term in it, so the 644
+  injections still collapse to 420 distinct calls exactly as `ledger/agent_eval_numbers.md`
+  records.
+- **Decode determinism**, which is **no longer secured by anything.** Nothing in the apparatus now
+  fixes the sampled output of a live call. The rewritten text says so, and says that replay from
+  the on-disk cache is what makes the reported numbers reproducible, while a second live run is a
+  new measurement rather than a repeat.
+
+`config.AGENT_TEMPERATURE` stays in `config.py`. S32's reasoning holds: deleting a constant a trace
+points at would falsify the trace, and this addendum is the trace.
+
+**Not repaired here, and named so it is not lost:** `config.py:508` still comments *"Model +
+temperature + prompt VERSION are pinned and stamped into every"*, which carries the same stale
+half. It is a code comment rather than a document claim, and editing the brain codebase was out of
+scope for S35.
