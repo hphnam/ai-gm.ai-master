@@ -4181,3 +4181,53 @@ them into the append-only log so it is the continuous WP1-to-present record.
      `.venv-forecast`, and 667 + 9 new tests = 676 reconciles exactly, so nothing regressed. The
      same failure mode as the 644 call count: written once, carried forward, never re-measured.
      `ruff` is installed in none of the four venvs, so no lint gate was run.
+
+124. **S33: `FLAGS.md:331` is wrong about `NeonAdapter`, and the reason it is wrong is that the
+     integration architecture superseded it. Correction recorded here; the flag is NOT edited.**
+     *Pinned to Ryan's repository at `cc93b6fa123791863072ec594dc3162208fa6812`, branch `master`,
+     2026-08-19. Read-only: nothing was written to that repository.*
+
+     **(a) The flag.** `brain/FLAGS.md:331` states, verbatim: *"**FLAG-LI2 (Neon
+     system-of-record — Ryan-gated).** `NeonAdapter` + DDL sketch ship"*. S32 §5 established the
+     symbol is absent from our codebase. S33 establishes it is absent from Ryan's as well.
+     Searches, excluding `node_modules` and `.git`: `NeonAdapter` (1 hit), `neon_adapter` (0),
+     `neon-adapter` (0), `NeonSource` (0), `BrainAdapter` (0), `brain_adapter` (0), plus a
+     case-insensitive `neon` file sweep (11 files, all documentation or config). **The one hit is
+     `GLOSSARY.md:175`, a glossary definition of the term, not an implementation.**
+
+     **(b) Why it does not matter, which is the part worth keeping.** The brain was never meant
+     to read Neon. `apps/api/src/modules/proactive-brain/brain-dataset.service.ts:61` reads
+     `venueSalesDaily` itself via `prisma.groupBy` and hands the brain a `ComputeDataset` — the
+     "dataset in, bundle out" contract in `brain/CONTRACT.md`. Corroborating: **Ryan's deployed
+     `brain/ingest/` has no `sources/` directory at all**, only `__init__.py`,
+     `exog_supplied.py`, `exog_weather.py`. `NeonAdapter` is a superseded plan, not a missing
+     deliverable, and no ingest work is owed on our side.
+
+     **(c) The VAT basis is settled from code, and the asymmetry runs the other way.**
+     `integrations/square/square-sales-source.ts:89` computes
+     `netMinor = moneyMinor(line.totalMoney) - moneyMinor(line.totalTaxMoney)` over orders
+     filtered to `COMPLETED`. Tax subtracted, discounts included, service charges and gratuities
+     excluded (order-level, never read), business date venue-LOCAL. **One code path, no
+     per-venue branching — Ryan's column is uniformly ex-VAT.** So the S32 §5.3 trap is real but
+     one-sided: it is **our** `revenue_raw` that varies by venue, and `revenue_exvat` stays the
+     only like-for-like column.
+
+     **(d) The chat-export question is narrowed, not closed.** No saved export query, dashboard
+     or script producing the 735-row CSV exists in the repository (searched `apps/api/scripts/`
+     for `ChatMessage`, and the tree for `*query*result*`, `*export*.sql`, `*.csv` — zero hits).
+     Four candidate filters are documented in the schema: `ChatConversation.userId` (excludes
+     other users and the `userId IS NULL` legacy WhatsApp threads), `deletedAt` (a soft delete
+     whose comment reads *"Reads filter on deletedAt IS NULL"*), `channel`, and a `role` value
+     `turn-failed` that our CSV does not contain. **`probe-elliot-usage.ts`, present in both
+     repositories, filters on `userId` but NOT on `deletedAt`**, so the two counting methods
+     already in the codebase disagree by construction. It stays a question for Ryan.
+
+     **(e) Silence is producible but not calibratable in his implementation.** `daily-summary` is
+     pulled (`@Get` only, no cron or fan-out), so it raises nothing. `nudges` does push and can
+     decline, returning `{ sent: false, reason: 'no items below par' | 'no imminent cutoffs' |
+     'no contactable duty manager' }` (`nudge.service.ts:40,42-43,47`). **But the decision is
+     deterministic — no model call in that service — so no probability attaches to the silence**,
+     and calibration of silence needs one. His side does not supply the Project Specification
+     §5.4 measurement either. This does not bear on ours: `signals/agent.py` emits `p_raise` per
+     item, and S32's pre-registration already records that our run measures **detection**
+     calibration, not the operator-judgement term.
