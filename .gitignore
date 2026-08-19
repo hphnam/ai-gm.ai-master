@@ -52,6 +52,20 @@ CLAUDE.local.md
 data/state_store.db/
 data/stream_store/
 
+# Raw exports must never sit at the repository ROOT. S37 removed two that did —
+# `items-2024-01-01-2026-06-01.csv` and `Elliot's AI-GM Questions - Query result.csv`
+# — which were later moved into brain/data/ but stayed in history at the root path,
+# sharing a blob with the copies there. Root-anchored with a leading slash, so
+# fixtures nested under apps/, docs/ and brain/ keep their own rules.
+/*.csv
+/*.xlsx
+/*.xls
+/*.parquet
+/*.duckdb
+/*.sqlite
+/*.sqlite3
+/*.db
+
 # Third-party exemplar dissertation, kept local. This remote is PUBLIC (verified
 # 2026-08-18), and the file is someone else's work; the other brain/docs entries
 # are issued guidance about the course, which is a different thing to redistribute.
