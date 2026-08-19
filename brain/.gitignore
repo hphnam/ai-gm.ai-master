@@ -12,5 +12,7 @@ __pycache__/
 store/brain.duckdb
 store/*.parquet
 
-# Raw data is symlinked from the repo root, never committed here
-data/*.csv
+# Raw data lives here at runtime, never committed (real venue trade and PII).
+# Broadened from `data/*.csv` to the whole directory: the extension list was
+# never the boundary, and `data/stock/*.xlsx` walked straight through it.
+data/

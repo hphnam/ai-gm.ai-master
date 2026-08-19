@@ -4404,3 +4404,84 @@ them into the append-only log so it is the continuous WP1-to-present record.
      references, citations or lost floats. **No float changed chapter**: all 12 figures and 22
      tables carry identical numbers and captions, and the nine that moved one page are all in
      Appendices B and C, downstream of the appendix edit. `venueordercheck` PASS.
+
+127. **S36: every shared file is reachable from a measured number, so twenty-one divergences
+     are refused and one is adopted; and `brain/` turns out not to exist at the merge base, so
+     the handover is a branch split rather than a merge.**
+     *Branch `ryan-adoption` cut from `brain-construction-local` at `b64eaf8b`; `main` untouched
+     at `c611d2e1`; nothing pushed; the Overleaf clone not touched. Ryan pinned at `cc93b6fa`
+     (his live `master` had moved to `393b52ad`; the pin was used anyway). Store ceiling asserted
+     at **2026-07-07** at both ends, read-only through `.venv-forecast`; no model load, no refit,
+     no rescore, no API call, nothing written to his repository. Report at
+     `brain/log/108_ryan_adoption.md`; instruments at `brain/ledger/adoption_fingerprint.md` and
+     `brain/ledger/ryan_divergence.md`.*
+
+     **(a) The eleven-value fingerprint is byte-identical at both ends**, SHA-256
+     `2c0533c4…` on both captures. Ten values matched the spec's expectations; **two did not, and
+     both were the spec's error, not a drift**: endpoints are **12** (10 in `service/app.py`, 2 in
+     `service/compute.py`), not 8, and the suite is **678 collected with one failure**, not 676
+     with none.
+
+     **(b) The one failing test fails at the baseline and was not repaired.**
+     `test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted` raises
+     `UnknownBasisError: unknown scale basis 'unscaled'`. Traced:
+     `config.VENUE_SCALE_BASIS["ellel"] == "unscaled"` reaches
+     `harness.point_metrics` at `models/ladder.py:405` **before** the two places the file handles
+     that basis (`_score` at `:440`, `loss_names` at `:449`). **So `evaluate_static("ellel")`
+     cannot complete, and the Ellel static-regime table in the committed artefact is not currently
+     reproducible.** Checked against the document: no Ellel static MASE is quoted anywhere, so
+     nothing in the dissertation rests on it. Recorded, not repaired — the repair is in
+     `models/ladder.py`.
+
+     **(c) Reachability was computed, not judged, and it settled the package.** An AST
+     import-closure walk seeded on each fingerprint value put **all seventeen Python files that
+     exist on both sides inside the union** (53 modules). Two non-obvious chains:
+     `models.ladder → org_profile → compute.contract`, and
+     `signals.briefing → signals.residual → conformal.wrap → features.build_features →
+     ingest.exog_weather`. One refinement was declared rather than assumed: value 11 is a list of
+     route decorators, so its reachability is the two files it is read from and not their closure.
+
+     **(d) Two of the spec's four expected class A premises were wrong, in the same direction.**
+     `WITH_FOUNDATION` is a **Dockerfile build ARG**, not a Python constant — it exists nowhere in
+     Python on either side. `EXO_ENABLED` is a **TypeScript constant** in
+     `apps/api/.../brain-dataset.service.ts:23`; his `brain/` has none. Both still class A, for
+     other reasons. `is_peak_trading_day` and the `with_prophet=False, pooled=False` call are class
+     A as expected, the latter also because it passes `feats=` and `deadline=`, which change
+     `evaluate_rolling`'s signature.
+
+     **(e) The row that makes the split permanent is `org_profile.py`, and his own contract
+     contradicts his own code on it.** At `cc93b6fa` his accessors call `_require()`, which raises
+     when unbound, and the file has no `import config`; his `CONTRACT.md` §4 still says verbatim
+     *"The unbound research path is untouched … the reason report 31's numbers still reproduce
+     from shipped code."* On his tree nothing in `brain/` runs outside a bound request. An
+     integrator must read the code.
+
+     **(f) `brain/` does not exist at the merge base.** `git ls-tree e79e317d -- brain` returns
+     zero files. `merge-tree` of `cc93b6fa` into `b64eaf8b` gives **44 conflicting paths, 34 under
+     `brain/`, 40 of the 44 `add/add`**; the only four genuine three-way conflicts are outside
+     `brain/`. **So the aim "adopt his changes so a later push does not conflict" cannot be met by
+     adopting changes** — there are none, there are two independently authored trees, and his own
+     code already names the resolution (`org_profile.py`: *"The research path lives on its own
+     branch now"*).
+
+     **(g) Our contract rejects his API's live payload, on exactly two fields.** The payload
+     `brain-dataset.service.ts:102-172` assembles was transcribed field for field and validated:
+     `extra_forbidden` on `prior_state.last_refit_by_venue` and on `max_refits`; strip those two
+     and it is ACCEPTED. Both belong to the refit ration. **Documented, not coded around** — adding
+     them as ignored optionals would accept `max_refits: 4`, re-select nothing, and say nothing.
+
+     **(h) His serving-path purity guard was run unmodified against our tree and FAILS**, with two
+     violations (`ingest.normalise` `read_csv` at :94 via `compute.loader → store.warehouse`;
+     `ingest.world_cup` `read_text` at :134 via `compute.forward → features.build_features`) and
+     all three curated modules reachable. His positive control passes, so the walk resolved. This
+     is report 101 R-6 confirmed by a second, independently written instrument.
+
+     **(i) One adoption, and it exposed something larger than itself.** Class C: one hunk of
+     `brain/.gitignore`, `data/*.csv` → `data/`. His line reads *"Purged from history on
+     brain-construction 2026-07-20."* Ours was not: **21 files of real venue trade and PII are
+     tracked and on the remote** — `brain/data/items-2024-01-01-2026-06-01.csv` at 77 MB of
+     item-grain sales, the 735-row question CSV, and 18 stock `.xlsx` — present in
+     `origin/brain-construction-local` **and `origin/main`**, added by `58e9b792` *"data
+     enrichment"*. The adopted rule stops the next one and remediates none of these. Class B was
+     empty; the closest call, his redacted 422 handler, was refused because the leak's precondition
+     does not exist on this side and the fix arrives with his file on an `add/add` path.
