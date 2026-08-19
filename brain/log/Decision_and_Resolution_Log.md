@@ -4103,3 +4103,81 @@ them into the append-only log so it is the continuous WP1-to-present record.
      file there. Harmless today: it sits on a numbered `\section`, not a starred heading, so it
      prints its own true number and strands nothing. **Not removed in this package**, because a
      removal can strand the label it left behind and the margin does not permit a surprise.
+
+123. **S32: the agent-evaluation numbers are re-derived from the apparatus and placed in a
+     reference ledger; the two blockers that stopped the run starting and finishing are fixed;
+     the pre-registration is drafted unsigned. One figure in report 103 is corrected.**
+     *Each part quotes verbatim the finding it records, per rule S27.*
+
+     **(a) The ledger exists: `brain/ledger/agent_eval_numbers.md`.** Every quantity was
+     re-derived by executing `build_scaled_corpus`, `surface`, `build_payload` and
+     `ResponseCache.key` against the store at ceiling **2026-07-07**, not transcribed from
+     report 103's prose. Corpus **644** (4×89 + 3×84 + 1×36; by kind 288/252/84/20), distinct
+     calls **420**, records **1,593**, positives **534**, base rate **0.335**, contradictory
+     label slots **4**. All matched report 103 except (b). Later packages read the ledger, not
+     the log.
+
+     **(b) Report 103 is corrected on one figure, and the correction makes the limitation
+     larger.** Report 103 §5.4 states, verbatim: *"224 injections share a cached response"*.
+     Re-measured, **305** injections sit in a shared group; those 305 collapse to 81 payloads,
+     which is what saves 644 − 420 = **224 calls**. 224 is the calls avoided, not the injections
+     sharing. **The independence limitation therefore covers 305 injections, not 224.** Report
+     103 is not edited; the ledger supersedes it on this point, in the ledger, per the rule that
+     a supersession marker belongs where the superseded claim is read.
+
+     **(c) The 400-on-call-one blocker is closed.** `signals/agent.py` sent
+     `temperature=config.AGENT_TEMPERATURE` to `claude-opus-4-8`; sampling parameters were
+     removed on Opus 4.7 and later and now 400, so the build failed before its first response
+     even with a valid credential. The argument is removed. **The freeze survived, and this was
+     demonstrated rather than asserted**: prompt hash `c1137f76a76fff5ecbdc53c484d1964175f30e6b…`
+     and the cache key for a fixed constructed payload
+     (`298f48e09b68ab3f5bf1fde238bbe9d6ca6565a2a…`) are byte-identical before and after the edit,
+     because temperature was never a term in `hash(model, prompt_hash, payload)`.
+
+     **(d) The all-or-nothing spend is closed.** `agent_calibration.run` called `cache.save()`
+     only after every call had succeeded, `ResponseCache` held responses in memory, and
+     `live_execute` had no retry — so a failure at call 419 of 420 discarded 419 bought
+     responses and the whole funded spend. `ResponseCache` now checkpoints every 25 live calls
+     and resumes from disk. **The cache file is unchanged by any of this**: an interrupted build
+     interrupted twice produces a cache byte-identical to an uninterrupted one, demonstrated over
+     a 30-call stub run in `tests/test_agent_cache_checkpoint.py`. Build history lives in a
+     sidecar (`agent_cache.build.json`) so byte-identity holds AND **a resumed run cannot be
+     reported as a clean one** — the record carries `resumed_from_entries`, `checkpoints` and
+     `retries`. Retry is bounded at 3 attempts and logs each one; a silent retry would convert a
+     transient failure into an unrecorded one.
+
+     **(e) The corpus's dependence on the store is measured, and it is not what it looks like.**
+     The injection stream is capped at `AGENT_EVAL_STREAM_CEILING = "2026-05-31"`, not at the
+     store ceiling, so store growth does **not** lengthen the streams. But `_usable_folds`
+     filters through `is_closed`/`active_trading_end`, which read the store **uncapped**. Two
+     River Taps is closed (active to 2026-05-08) and contributes 3 folds of 4; if post-ceiling
+     rows showed it trading again the corpus would go to **728**. **644 is invariant to store
+     growth through the stream and not invariant through the closure filter.**
+
+     **(f) V4 stopped at its first step, as instructed, and did not substitute an assumption.**
+     The POS reconciliation requires `VenueSalesDaily` on Neon. Measured: no DSN in the
+     environment, no `.env` in the tree, and **`NeonAdapter` is absent from the codebase
+     entirely** — a case-insensitive search across every `.py` and `.ts` returns zero hits,
+     though `FLAGS.md:331` states it *"ships"*. `VenueSalesDaily` appears nowhere in the
+     repository. The export request is specified in report 104 §5 and the reconciliation is
+     **not attempted**; the standing ruling that training need not be re-run is therefore
+     neither supported nor refuted by this package.
+
+     **(g) The pre-registration is drafted and deliberately NOT committed as active.**
+     `brain/ledger/prereg_agent_eval.md` carries the frozen apparatus, the derived 420 with its
+     detector-dependence, the construct as **detection** calibration, the three computed terms
+     and the fourth at N = 0, the declared limitations, and the predicted outcome. **It states
+     that no decision rule exists in the specification rather than inventing one.** It is signed
+     by Nam and the git timestamp is the proof, so committing it as pre-registered would destroy
+     the thing it exists to establish.
+
+     **(h) The recorded test baseline was wrong, and is corrected here.**
+     `ledger/phase_state.md:5314-5315` records, verbatim: *"642 of 643 collected, 1 deselected"*
+     and *"641 passed, 1 skipped, 1 deselected"*. Checked out at `0db56339` — the S29 commit
+     that recorded it — the tree collects **669**, not 643, and the last commit to touch
+     `brain/tests/` (`f0c3d5bc`) predates the record by three days. **The record understated the
+     suite by 26 tests when it was written.** True baseline: **667 passed, 1 skipped, 1
+     deselected**. This package's run gives **676 passed, 1 skipped, 1 deselected, 0 failed** in
+     `.venv-forecast`, and 667 + 9 new tests = 676 reconciles exactly, so nothing regressed. The
+     same failure mode as the 644 call count: written once, carried forward, never re-measured.
+     `ruff` is installed in none of the four venvs, so no lint gate was run.

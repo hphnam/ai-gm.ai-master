@@ -163,10 +163,16 @@ def parse_response(response: dict, items: list[dict],
 # --- Live call (needs the SDK + a key; imported lazily) ----------------------
 
 def live_execute(payload: dict, version: str | None = None) -> dict:  # pragma: no cover - needs network + key
-    """Call the pinned agent model at temperature 0 with structured output.
+    """Call the pinned agent model with structured output.
 
     Mirrors the judge's live seam. Imported lazily so the module and the offline
     evaluation load with `anthropic` absent. Returns the parsed response dict.
+
+    No `temperature` is sent: sampling parameters were removed on Opus 4.7 and later and
+    now 400, so passing `config.AGENT_TEMPERATURE` failed on call one against the pinned
+    `claude-opus-4-8`. The determinism the pre-registration relies on is unaffected, and
+    so is the frozen prompt hash: the cache key is
+    `hash(model, prompt_hash, scenario_payload)` and temperature was never a term in it.
     """
     import anthropic
 
@@ -174,7 +180,6 @@ def live_execute(payload: dict, version: str | None = None) -> dict:  # pragma: 
     resp = client.messages.create(
         model=config.AGENT_MODEL,
         max_tokens=config.AGENT_MAX_TOKENS,
-        temperature=config.AGENT_TEMPERATURE,
         system=load_prompt(version),
         output_config={"format": {"type": "json_schema", "schema": SCORING_SCHEMA}},
         messages=[{"role": "user", "content": payload_json(payload)}],

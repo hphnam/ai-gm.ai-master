@@ -5481,3 +5481,61 @@ rasterising p13 and looking, after a `get_drawings()` probe was found to scan an
 figure is an embedded XObject).
 
 **Every SHA in the §0 table of `log/102` before this entry is superseded.** Report §8 carries it.
+
+## 2026-08-19 — S32: the numbers into a ledger, the two blockers closed, the pre-registration drafted
+
+Read-only audit (S30) turned into durable record plus two narrow fixes. **No API call, no
+credential use, no `.tex` edit, zero counted body words.** Store ceiling **2026-07-07**,
+asserted at both ends, opened `read_only=True` throughout.
+
+1. **`brain/ledger/agent_eval_numbers.md` is the reference artefact now**, not report 103.
+   Every quantity re-derived by executing `build_scaled_corpus` / `surface` / `build_payload` /
+   `ResponseCache.key` against the store. Corpus **644**, distinct calls **420**, records
+   **1,593**, positives **534**, base rate **0.335**, contradictory label slots **4**.
+
+2. **One figure in report 103 is corrected, and the correction enlarges the limitation.**
+   103 §5.4 says *"224 injections share a cached response"*. Re-measured: **305** injections sit
+   in a shared group, collapsing to 81 payloads, which is what saves 644 − 420 = **224 calls**.
+   224 is calls avoided; 305 is injections sharing. The independence limitation covers **47 %**
+   of the corpus, not 35 %.
+
+3. **The 400-on-call-one blocker is closed.** `temperature` removed from `live_execute`. The
+   freeze was *demonstrated* intact, not asserted: prompt hash `c1137f76a76f…` and the cache key
+   `298f48e09b68…` for a fixed constructed payload are byte-identical across the edit.
+   `config.AGENT_TEMPERATURE` deliberately **kept** — deleting it would falsify the trace behind
+   the document sentence *"Temperature is zero and the model identifier is pinned"*
+   (`numbers_audit.md:187`), which is now stale and is Nam's `.tex` fix.
+
+4. **The all-or-nothing spend is closed.** `ResponseCache` checkpoints every 25 live calls and
+   resumes from disk; bounded logged retry (3 attempts). Build history in a **sidecar**
+   (`agent_cache.build.json`) so the cache stays byte-identical between an interrupted and an
+   uninterrupted build AND a resumed run cannot be reported as clean. Demonstrated over a
+   30-call stub build interrupted twice: caches identical.
+   `tests/test_agent_cache_checkpoint.py`, 9 tests.
+
+5. **The corpus is not invariant to the evaluation window, and this was measured.** Re-running
+   `build_scaled_corpus` read-only with `BRAIN_AGENT_EVAL_CEILING=2026-07-07` (five weeks later,
+   data already in the store) gives **476 injections, not 644** — Two River Taps falls from 3
+   usable folds to 1 as its folds pass its 2026-05-08 closure. **A post-ceiling evaluation is a
+   different experiment.** Second, subtler route: `_usable_folds` reads `is_closed` /
+   `active_trading_end` on the **uncapped** store, so post-ceiling rows showing TRT trading
+   again would take the registered corpus to **728** with the eval ceiling untouched.
+
+6. **V4 stopped at step 1 and substituted nothing.** No DSN, no `.env`, `VenueSalesDaily` absent
+   from the repository, and **`NeonAdapter` absent from the codebase entirely** though
+   `FLAGS.md:331` says it *"ships"*. Local side measured and waiting. **A VAT trap was found
+   before any comparison**: `revenue_raw` is ex-VAT at beer_hall and ellel (ratio 1.000) and
+   **VAT-inclusive at two_river_taps** (1.200). Joining Ryan's ex-VAT export to it would show a
+   clean 1.20 offset at one venue and read as divergence when it is a basis difference.
+   `revenue_exvat` is the only like-for-like column.
+
+7. **`brain/ledger/prereg_agent_eval.md` drafted, UNSIGNED, deliberately not committed as
+   active.** It reports that one decision rule exists (`decorative = disagreement_rate <= 0.05`,
+   covering term 3) and that **no criterion is stated for ECE or Brier**, leaving that blank for
+   Nam rather than inventing one.
+
+8. **The recorded test baseline was wrong.** `phase_state.md:5314-5315` recorded *"642 of 643
+   collected"* / *"641 passed"*; the S29 commit `0db56339` in fact collects **669**, and no test
+   landed between that record and now. **True baseline 667 passed, 1 skipped, 1 deselected.**
+   This run: **676 passed, 1 skipped, 1 deselected, 0 failed**, 569.55 s, `.venv-forecast`;
+   667 + 9 = 676 reconciles exactly. `ruff` is in none of the four venvs, so no lint gate ran.
