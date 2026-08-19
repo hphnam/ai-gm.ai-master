@@ -4231,3 +4231,86 @@ them into the append-only log so it is the continuous WP1-to-present record.
      §5.4 measurement either. This does not bear on ours: `signals/agent.py` emits `p_raise` per
      item, and S32's pre-registration already records that our run measures **detection**
      calibration, not the operator-judgement term.
+
+125. **S34: every open Hansi item is drafted on a branch that is never pushed, and the density
+     pass that S28 priced at +150 to +450 measures -4. Two of the six items are applied and
+     finished, three need a ruling, and nothing that the package asked to be offered as an option
+     was selected.**
+     *Overleaf clone, branch `feedback-hansi` at `0d87d8a`, one commit ahead of `main` and
+     unpushed. `git ls-remote origin` returns `019f1354…` for both `HEAD` and `refs/heads/main` at
+     the start and at the end of the package. Local `main` is unmoved. Report at
+     `brain/log/106_hansi_items_drafted.md`.*
+
+     **(a) The cap is suspended inside the package and the branch is 85 words over it.** Counted
+     body 19,985 → 20,085 by `texcount -0 -sum -merge -total` over the seven files
+     `\bodywordcount` names. Appendices unchanged at 10,631. This is the declared consequence of
+     Nam's "bring everything to paper first" ruling, not a failure, and Overleaf continues to
+     serve the compliant document.
+
+     **(b) Applied: H-2 at +28, H-5 at +41, H-6(a) at +2, H-6(b) at +33, H-8 at -4.** Each
+     measured before and after on the same instrument. Three of the four divergences from S28's
+     forecasts are instrument facts rather than drift. **H-2's +2 is `texcount` splitting a `--`
+     compound into two tokens**, measured directly rather than inferred: `alpha precision--recall
+     omega` counts 4 and `alpha precision-recall omega` counts 3, so the VUS-PR expansion costs
+     seven where a prose count predicts six. **H-5's +15 is that S28 compared five bare questions
+     (123 words) against five openers (97) that include their ordinal framing**; 97 + 41 = 138 =
+     123 + 15, and the unframed variant measures at exactly the forecast +26.
+
+     **(c) THE DENSITY FORECAST PRICED A DIFFERENT OPERATION.** S28 forecast +2 to +5 per split
+     and concluded a rhythm pass was unaffordable at the margin. **26 splits across the twenty
+     longest sentences measured -4.** The forecast is right for a long sentence that is one clause
+     with subordinate matter, where a split needs a new subject and a connective. It is wrong for
+     this document, whose long sentences are overwhelmingly two or more independent clauses
+     **already joined by a semicolon or a colon**: the punctuation is replaced rather than added
+     and capitalisation is free. The four words lost are the coordinating "and" or "while" at a
+     junction that became a full stop. Longest sentence in the counted body 114 → 72, and the 72
+     is the one refused; Conclusions falls from one sentence in six over 40 words to one in ten.
+     **A rhythm pass on this document is affordable at any margin.**
+
+     **(d) "rather than" is 187, not 174.** S28's counter reads line by line, and **13 instances
+     are split across a line break**. The same-line count at `HEAD` is exactly 174, which confirms
+     the mechanism rather than inferring it. The construction runs one every 150 words, not one
+     every 182. 187 before the pass and 187 after: none was deleted, which is what `99ee32b`'s
+     ruling requires and what V6 was scoped to respect.
+
+     **(e) The abstract's venueordercheck consequence is the opposite of the one anticipated, and
+     it is what decides between the two drafts.** Removing the 399/386/331 triple cannot create an
+     UNANCHORED finding: the check grades on **two or more** positional triples in a paragraph
+     naming no venue, and the abstract has been one paragraph since HC4, so removing the only
+     triple takes the file from one to zero. **The instrument was verified live rather than
+     reasoned about.** A control probe restoring `retain five, six and four` makes draft 1a FAIL
+     UNANCHORED and leaves draft 1b PASSING. **So 1a keeps the file at the check's ceiling, where
+     any future addition is caught, and 1b spends that protection** in exchange for carrying the
+     frame lengths as a range that cannot be read positionally at all. Neither selected.
+
+     **(f) Three of S28's six load-bearing appendix references are reclassified, each on the body
+     sentence rather than on the label.** `app:elicitation`, `app:mondrian` and
+     `app:agent-apparatus` all have their limit stated in the body, in most cases in the sentence
+     immediately before the pointer. **Two must-promote deferrals survive**: `app:static-regime`
+     (`methodology.tex:377`, +15 or +28) and `app:conformal-bounds` (`conclusion.tex:219`, +20 or
+     +33), the second because a Further Work proposal rests on a ceiling that exists nowhere else
+     and that not partitioning at all already reaches on the cell in question. Two should-promote
+     (+23, +10). **The objectives-in-Appendix-D member was closed by H-6(b) at +33.** Nothing
+     moved.
+
+     **(g) Two rewrites were refused, both on a rule rather than on taste.** The five-contribution
+     list cannot be split without detaching *"specified and frozen and has not been run"* from its
+     contribution, which C5 requires to stay in the same sentence. The second available split at
+     the exponential-smoothing rung removes "because" and with it the stated causal link between
+     frame length and the decision not to run an information-criterion search.
+
+     **(h) Found while rewriting, left for a ruling.** `introduction.tex` `sec:intro-gap` opens
+     *"Each of those three requirements"* and follows with **four** qualifications. The three are
+     at `:77-80`; the four limbs are pooling, weather, the conformal band and the alert cost, with
+     the first two both serving requirement one. The mapping is 4 to 3, correct, and stated
+     nowhere, and the antecedent sits across a `\section` boundary. The split makes it easier to
+     see and neither creates nor repairs it.
+
+     **(i) No number, `\ref`, `\label` or citation key was altered.** All four token classes were
+     extracted from `git show HEAD:` and from each working file, comment-stripped, and compared
+     sorted across the seven counted files. One difference, the intended
+     `\ref{sec:conclusion-objectives}` from H-6(b) — whose label had **no live body reference at
+     all** before this package, its only occurrence being inside a comment. `latexcheck` PASS at
+     116 pages with zero undefined references, citations or lost floats. **No float moved page**:
+     `main.tex` was built at `HEAD` in a throwaway worktree and its `main.lof` and `main.lot` are
+     byte-identical to the branch build's, page numbers included.
